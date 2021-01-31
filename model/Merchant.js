@@ -1,6 +1,17 @@
 const mongoose = require('mongoose')
 
 const merchantSchema = new mongoose.Schema({
+    username:{
+        type:String,
+        unique: true,
+        minlength:6,
+        maxlength:30,
+        require:true
+    },
+    password:{
+        type:String,
+        require:true
+    },
     name:{
         type:String,
         require:true
@@ -17,8 +28,11 @@ const merchantSchema = new mongoose.Schema({
         type:[String],
         require:true,
     },
+    dayoff:{
+        type:[Date],
+    },
     avt:{
-        type:Buffer,
+        type:String,
         require:true
     },
     foods:{
@@ -31,13 +45,20 @@ const merchantSchema = new mongoose.Schema({
     },
     reviews:{
         type:[reviewSchema],
-    }
+    },
+    status:{
+        type:String,
+        enum:['active','suspend'],
+        default:'active',
+        require:true
+    },
 })
 
 const reviewSchema = new mongoose.Schema({
     user:{
         type:mongoose.ObjectId,
-        require:true
+        require:true,
+        ref:'User'
     },
     star:{
         type:Number,
@@ -63,6 +84,10 @@ const categorySchema = new mongoose.Schema({
 
 const representativeSchema = new mongoose.Schema({
     nameRepre:{
+        type:String,
+        require:true
+    },
+    address:{
         type:String,
         require:true
     },
@@ -109,7 +134,10 @@ const foodSchema = new mongoose.Schema({
         maxlength:8,
         require:true
     },
-    catId:mongoose.ObjectId,
+    catId:{
+        type:mongoose.ObjectId,
+        ref:'categorySchema'
+    },
     img:Buffer
 })
 

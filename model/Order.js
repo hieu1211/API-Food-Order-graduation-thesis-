@@ -3,7 +3,8 @@ const mongoose = require('mongoose')
 const orderSchema = new mongoose.Schema({
     userOrder:{
         type:mongoose.ObjectId,
-        require:true
+        require:true,
+        ref:'User'
     },
     timeOrder:{
         type:Date,
@@ -14,11 +15,13 @@ const orderSchema = new mongoose.Schema({
         default:null
     },
     deliver:{
-        type:mongoose.ObjectId
+        type:mongoose.ObjectId,
+        ref:'Partner'
     },
     merchant:{
         type:mongoose.ObjectId,
-        require:true
+        require:true,
+        ref:'Merchant'
     },
     status:{
         type:String,
@@ -28,6 +31,7 @@ const orderSchema = new mongoose.Schema({
         type:detailSchema,
         require:true
     },
+    report:String
 })
 
 const detailSchema = new mongoose.Schema({

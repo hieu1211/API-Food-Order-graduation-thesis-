@@ -1,5 +1,27 @@
 const mongoose = require('mongoose')
 
+const infoSchema = new mongoose.Schema({
+    name:{
+        type:String,
+        maxlength:30,
+        require:true
+    },
+    gender:{
+        type:String,
+        enum: ['male', 'female'],
+        require:true
+    },
+    avt:{
+        type:String,
+        require:true
+    },
+    phone:{
+        type:Number,
+        length:10,
+        require:true
+    },
+})
+
 const userSchema = new mongoose.Schema({
     username:{
         type:String,
@@ -17,29 +39,11 @@ const userSchema = new mongoose.Schema({
         require:true
     },
     favoriteMerchant:{
-        type:[mongoose.ObjectId]
+        type:[mongoose.ObjectId],
+        ref:'Merchant'
     }
 })
 
-const infoSchema = new mongoose.Schema({
-    name:{
-        type:String,
-        require:true
-    },
-    gender:{
-        type:String,
-        enum: ['male', 'female'],
-        require:true
-    },
-    avt:{
-        type:Buffer,
-        require:true
-    },
-    phone:{
-        type:String,
-        length:10,
-        require:true
-    },
-})
+
 
 module.exports = mongoose.model('User',userSchema)
