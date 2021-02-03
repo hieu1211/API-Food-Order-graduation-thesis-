@@ -1,4 +1,93 @@
+const { date, number } = require('@hapi/joi')
 const mongoose = require('mongoose')
+
+const reviewSchema = new mongoose.Schema({
+    user:{
+        type:mongoose.ObjectId,
+        require:true,
+        ref:'User'
+    },
+    star:{
+        type:Number,
+        max:5,
+        min:1
+    },
+    content:{
+        type:String,
+        require:true
+    },
+    date:{
+        type:Date,
+        require:true
+    }
+})
+
+const categorySchema = new mongoose.Schema({
+    nameCat:{
+        type:String,
+        maxlength:50,
+        require:true
+    }
+})
+
+const representativeSchema = new mongoose.Schema({
+    name:{
+        type:String,
+        require:true
+    },
+    address:{
+        type:String,
+        require:true
+    },
+    identity:{
+        type:String,
+        minlength:9,
+        maxlength:12,
+        require:true
+    },
+    phone:{
+        type:Number,
+        length:10,
+        require:true
+    }
+})
+
+const locationSchema = new mongoose.Schema({
+    address:{
+        type:String,
+        maxlength:150,
+        require:true
+    },
+    ward:{
+        type:String,
+        maxlength:20,
+        require:true
+    },
+    district:{
+        type:String,
+        maxlength:20,
+        require:true
+    }
+})
+
+const foodSchema = new mongoose.Schema({
+    name:{
+        type:String,
+        minlength:2,
+        maxlength:50,
+        require:true
+    },
+    price:{
+        type:Number,
+        maxlength:8,
+        require:true
+    },
+    catId:{
+        type:mongoose.ObjectId,
+        ref:'categorySchema'
+    },
+    img:Buffer
+})
 
 const merchantSchema = new mongoose.Schema({
     username:{
@@ -52,93 +141,21 @@ const merchantSchema = new mongoose.Schema({
         default:'active',
         require:true
     },
-})
-
-const reviewSchema = new mongoose.Schema({
-    user:{
-        type:mongoose.ObjectId,
-        require:true,
-        ref:'User'
-    },
-    star:{
-        type:Number,
-        max:5,
-        min:1
-    },
-    content:{
-        type:String,
-        require:true
-    },
-    date:{
+    dateCreate:{
         type:Date,
-        require:true
-    }
-})
-
-const categorySchema = new mongoose.Schema({
-    nameCat:{
-        type:String,
-        require:true
-    }
-})
-
-const representativeSchema = new mongoose.Schema({
-    nameRepre:{
-        type:String,
+        default:Date.now,
         require:true
     },
-    address:{
-        type:String,
-        require:true
-    },
-    identity:{
+    deduct:{
         type:Number,
-        minlength:9,
-        maxlength:12,
-        require:true
-    },
-    phone:{
-        type:Number,
-        length:10,
+        default:10,
+        maxlength:3,
         require:true
     }
 })
 
-const locationSchema = new mongoose.Schema({
-    location:{
-        type:String,
-        maxlength:150,
-        require:true
-    },
-    ward:{
-        type:String,
-        maxlength:20,
-        require:true
-    },
-    district:{
-        type:String,
-        maxlength:20,
-        require:true
-    }
-})
 
-const foodSchema = new mongoose.Schema({
-    nameFood:{
-        type:String,
-        minlength:2,
-        maxlength:50,
-        require:true
-    },
-    price:{
-        type:Number,
-        maxlength:8,
-        require:true
-    },
-    catId:{
-        type:mongoose.ObjectId,
-        ref:'categorySchema'
-    },
-    img:Buffer
-})
-
-module.exports = mongoose.model('Merchant',merchantSchema)
+module.exports = {
+    Categorry:mongoose.model('Category',categorySchema),
+    Merchant:mongoose.model('Merchant',merchantSchema)
+}

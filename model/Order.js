@@ -8,11 +8,13 @@ const orderSchema = new mongoose.Schema({
     },
     timeOrder:{
         type:Date,
-        default:Date.now
+        default:Date.now,
+        require:true
     },
     timeFinish:{
         type:Date,
-        default:null
+        default:null,
+        require:true
     },
     deliver:{
         type:mongoose.ObjectId,
@@ -44,4 +46,5 @@ const detailSchema = new mongoose.Schema({
 })
 
 module.exports = mongoose.model('Order',orderSchema)
+
 
