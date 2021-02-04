@@ -5,11 +5,11 @@ const registerMerchantValidation = (data)=>{
     const schema = Joi.object({
         username: Joi.string().min(6).max(30).required(),
         password: Joi.string().required(),
-        name:Joi.string.require(),
+        name:Joi.string().required(),
         representative:Joi.object({
-            name:Joi.string.require(),
-            address:Joi.string.require(),
-            identity:Joi.string.min(9).max(12).require(),
+            name:Joi.string().required(),
+            address:Joi.string().required(),
+            identity:Joi.string().min(9).max(12).required(),
             phone:Joi.number().min(10**7).max(10**9 - 1).required(),
         }),
         location:Joi.object({
@@ -18,15 +18,23 @@ const registerMerchantValidation = (data)=>{
             district:Joi.string().max(20).required()
         }).required(),
         opentime:Joi.array().items(Joi.string().max(4).required()).required(),
-        dayoff:Joi.array().items(Joi.date()),
+        dayoff:Joi.array().items(Joi.string()),
         avt:Joi.string(),
-        foods:Joi.array().items(Joi.object({
-            name:Joi.string().min(2).max(50).required(),
-            price:Joi.number().min(10**3).max(10**8-1),
-            catId:Joi.objectId().required()
-        })),
+        // foods:Joi.array().items(Joi.object({
+        //     name:Joi.string().min(2).max(50).required(),
+        //     price:Joi.number().min(10**3).max(10**8-1).required,
+        //     catId:Joi.objectId().required(),
+
+        // })),
+        // category:Joi.array().items(Joi.object({
+        //     name:Joi.string().max(50).required(),
+        // }))
         category:Joi.array().items(Joi.object({
             name:Joi.string().max(50).required(),
+            foods:Joi.array().items(Joi.object({
+                name:Joi.string().max(50).required(),
+                price:Joi.number().max(10**7).required()
+            }))
         }))
     })
     return schema.validate(data)

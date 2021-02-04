@@ -48,6 +48,10 @@ const infoSchema = new mongoose.Schema({
         length:10,
         require:true
     },
+    dateCreate:{
+        type:String,
+        default:Date.now
+    }
 })
 
 

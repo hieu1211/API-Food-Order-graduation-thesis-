@@ -8,7 +8,7 @@ module.exports = function(req,res,next){
         next()
     }
     catch(error){
-        res.status(400).send(error)
+        next()
     }
 
 }

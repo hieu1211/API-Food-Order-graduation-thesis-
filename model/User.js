@@ -16,7 +16,7 @@ const infoSchema = new mongoose.Schema({
         require:true
     },
     phone:{
-        type:Number,
+        type:String,
         length:10,
         require:true
     },
@@ -30,9 +30,9 @@ const userSchema = new mongoose.Schema({
         maxlength:30,
         require:true
     },
-    password:{
-        type:String,
-        require:true
+        password:{
+            type:String,
+            require:true
     },
     info:{
         type: infoSchema,

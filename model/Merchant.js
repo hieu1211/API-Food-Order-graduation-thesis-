@@ -1,4 +1,3 @@
-const { date, number } = require('@hapi/joi')
 const mongoose = require('mongoose')
 
 const reviewSchema = new mongoose.Schema({
@@ -17,13 +16,13 @@ const reviewSchema = new mongoose.Schema({
         require:true
     },
     date:{
-        type:Date,
-        require:true
+        type:String,
+        default:Date.now
     }
 })
 
 const categorySchema = new mongoose.Schema({
-    nameCat:{
+    name:{
         type:String,
         maxlength:50,
         require:true
@@ -46,7 +45,7 @@ const representativeSchema = new mongoose.Schema({
         require:true
     },
     phone:{
-        type:Number,
+        type:String,
         length:10,
         require:true
     }
@@ -73,7 +72,6 @@ const locationSchema = new mongoose.Schema({
 const foodSchema = new mongoose.Schema({
     name:{
         type:String,
-        minlength:2,
         maxlength:50,
         require:true
     },
@@ -117,8 +115,9 @@ const merchantSchema = new mongoose.Schema({
         type:[String],
         require:true,
     },
-    dayoff:{
-        type:[Date],
+    phone:{
+        type:String,
+        require:true
     },
     avt:{
         type:String,
@@ -137,14 +136,13 @@ const merchantSchema = new mongoose.Schema({
     },
     status:{
         type:String,
-        enum:['active','suspend'],
-        default:'active',
+        enum:['open','close','suspend'],
+        default:'open',
         require:true
     },
     dateCreate:{
-        type:Date,
+        type:String,
         default:Date.now,
-        require:true
     },
     deduct:{
         type:Number,
@@ -156,6 +154,6 @@ const merchantSchema = new mongoose.Schema({
 
 
 module.exports = {
-    Categorry:mongoose.model('Category',categorySchema),
+    Category:mongoose.model('Category',categorySchema),
     Merchant:mongoose.model('Merchant',merchantSchema)
 }

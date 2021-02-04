@@ -7,14 +7,12 @@ const orderSchema = new mongoose.Schema({
         ref:'User'
     },
     timeOrder:{
-        type:Date,
+        type:String,
         default:Date.now,
-        require:true
     },
     timeFinish:{
-        type:Date,
+        type:String,
         default:null,
-        require:true
     },
     deliver:{
         type:mongoose.ObjectId,
