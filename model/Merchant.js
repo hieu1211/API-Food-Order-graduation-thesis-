@@ -21,10 +21,28 @@ const reviewSchema = new mongoose.Schema({
   },
 });
 
+const foodSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    maxlength: 50,
+    require: true,
+  },
+  price: {
+    type: Number,
+    maxlength: 8,
+    require: true,
+  },
+  img: Buffer,
+});
+
 const categorySchema = new mongoose.Schema({
   name: {
     type: String,
     maxlength: 50,
+    require: true,
+  },
+  foods: {
+    type: [foodSchema],
     require: true,
   },
 });
@@ -69,24 +87,6 @@ const locationSchema = new mongoose.Schema({
   },
 });
 
-const foodSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    maxlength: 50,
-    require: true,
-  },
-  price: {
-    type: Number,
-    maxlength: 8,
-    require: true,
-  },
-  catId: {
-    type: mongoose.ObjectId,
-    ref: "categorySchema",
-  },
-  img: Buffer,
-});
-
 const merchantSchema = new mongoose.Schema({
   username: {
     type: String,
@@ -111,6 +111,17 @@ const merchantSchema = new mongoose.Schema({
     type: locationSchema,
     require: true,
   },
+  typeFood: {
+    type: Number,
+    required: true,
+    enum: [0, 1],
+    //0:eat     1: drink
+  },
+  daypart: {
+    type: Number,
+    enum: [0, 1, 2],
+    //0: Morning, 1:Afternoon 2:Evening
+  },
   openTime: {
     type: [String],
     require: true,
@@ -121,10 +132,6 @@ const merchantSchema = new mongoose.Schema({
   },
   avt: {
     type: String,
-    require: true,
-  },
-  foods: {
-    type: [foodSchema],
     require: true,
   },
   category: {

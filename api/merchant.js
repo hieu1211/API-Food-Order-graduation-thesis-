@@ -13,18 +13,9 @@ router.post("/register", async (req, res) => {
   // if(req.permission!=='manager') return res.status(401).send('Unauthorized')
   const { error } = registerMerchantValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  let foods = [];
-  const category = [];
-  for (let cate of req.body.category) {
-    const cat = new Category({ name: cate.name });
-    category.push(cat);
-    foods = foods.concat(cate.foods.map((food) => ({ ...food, catId: cat })));
-  }
   const merchant = new Merchant({
     ...req.body,
     password: md5(req.body.password),
-    category,
-    foods,
   });
   try {
     const savedMerchant = await merchant.save();
@@ -65,6 +56,33 @@ router.get("/", jwtValidation, async (req, res) => {
       ]);
       res.send(merchants);
     }
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+router.get("/search", jwtValidation, async (req, res) => {
+  try {
+    const nameMerchant = req.query.name;
+    const nameFood = req.query.food;
+    if (nameMerchant) {
+      if (req.permission !== "manager") {
+        const merchants = await Merchant.find({
+          name: new RegExp(nameMerchant, "i"),
+        });
+        res.send(merchants);
+      } else {
+        const merchants = await Merchant.find({
+          name: new RegExp(nameMerchant, "i"),
+        }).select(["-username", "-password", "-representative"]);
+        res.send(merchants);
+      }
+    } else if (nameFood) {
+      const merchants = await Merchant.find({
+        "category.foods.name": new RegExp(nameFood, "i"),
+      }).select(["-username", "-password", "-representative"]);
+      res.send(merchants);
+    } else res.send({});
   } catch (err) {
     res.status(400).send(err);
   }

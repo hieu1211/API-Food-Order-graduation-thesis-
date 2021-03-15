@@ -1,20 +1,25 @@
 const express = require("express");
 const router = express.Router();
 const { loginValidation } = require("../middleware/auth.validate");
-const { registerUserValidation } = require("../middleware/register.validate");
+const {
+  registerManagerValidation,
+} = require("../middleware/register.validate");
 const jwtValidation = require("../middleware/jwt.validate");
-const User = require("../model/User");
+const Manager = require("../model/Manager");
 const md5 = require("md5");
 const jwt = require("jsonwebtoken");
 
-//User register
+//Manager register
 router.post("/register", async (req, res) => {
-  const { error } = registerUserValidation(req.body);
+  const { error } = registerManagerValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  const user = new User({ ...req.body, password: md5(req.body.password) });
+  const manager = new Manager({
+    ...req.body,
+    password: md5(req.body.password),
+  });
   try {
-    const savedUser = await user.save();
-    res.send(savedUser);
+    const savedManager = await manager.save();
+    res.send(savedManager);
   } catch (error) {
     res.status(400).send(error);
   }
@@ -24,41 +29,18 @@ router.post("/register", async (req, res) => {
 router.post("/login", async (req, res) => {
   const { error } = loginValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  const user = await User.findOne({ username: req.body.username });
-  if (!user) return res.status(400).send("Username doesn't exist!");
-  if (user.password !== md5(req.body.password))
+  const manager = await Manager.findOne({ username: req.body.username });
+  if (!manager) return res.status(400).send("Username doesn't exist!");
+  if (manager.password !== md5(req.body.password))
     return res.status(400).send("Password is wrong!");
   const token = jwt.sign(
-    { _id: user._id, permission: "user" },
+    { _id: manager._id, permission: "manager" },
     process.env.SECRET_KEY
   );
   res.status(200).header({ auth_token: token }).send(token);
 });
 
 //Query user by id
-router.get("/:id", jwtValidation, async (req, res) => {
-  if (
-    req.permission !== "manager" &&
-    (req.permission !== "user" || req._id !== req.params.id)
-  )
-    return res.status(401).send("Unauthorized");
-  try {
-    const user = await User.find({ _id: req.params.id });
-    res.send(user);
-  } catch (err) {
-    res.status(400).send(err);
-  }
-});
-
-//Query all user
-router.get("/", async (req, res) => {
-  try {
-    const user = await User.find({});
-    res.send(user);
-  } catch (err) {
-    res.status(400).send(err);
-  }
-});
 
 router.post("/auth", (req, res) => {
   try {

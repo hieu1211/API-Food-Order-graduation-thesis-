@@ -4,7 +4,7 @@ const managerSchema = new mongoose.Schema({
   username: {
     type: String,
     unique: true,
-    minlength: 6,
+    minlength: 2,
     maxlength: 30,
     require: true,
   },
