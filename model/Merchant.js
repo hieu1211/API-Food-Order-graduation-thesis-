@@ -1,3 +1,4 @@
+const md5 = require("md5");
 const mongoose = require("mongoose");
 
 const reviewSchema = new mongoose.Schema({
@@ -75,20 +76,70 @@ const locationSchema = new mongoose.Schema({
     maxlength: 150,
     require: true,
   },
-  ward: {
-    type: String,
-    maxlength: 20,
+  district: {
+    type: Number,
+    min: 1,
+    max: 12,
     require: true,
   },
-  district: {
+  lat: {
     type: String,
-    maxlength: 20,
+    require: true,
+  },
+  lng: {
+    type: String,
     require: true,
   },
 });
 
+const timeSchema = new mongoose.Schema({
+  label: {
+    type: String,
+    require: true,
+  },
+  enable: {
+    type: Boolean,
+    require: true,
+    default: true,
+  },
+  time: {
+    type: String,
+    require: true,
+  },
+});
+
+const openTimeSchema = new mongoose.Schema({
+  mon: {
+    type: timeSchema,
+    require: true,
+  },
+  tue: {
+    type: timeSchema,
+    require: true,
+  },
+  wed: {
+    type: timeSchema,
+    require: true,
+  },
+  thu: {
+    type: timeSchema,
+    require: true,
+  },
+  fri: {
+    type: timeSchema,
+    require: true,
+  },
+  sat: {
+    type: timeSchema,
+    require: true,
+  },
+  sun: {
+    type: timeSchema,
+    require: true,
+  },
+});
 const merchantSchema = new mongoose.Schema({
-  username: {
+  email: {
     type: String,
     unique: true,
     minlength: 6,
@@ -98,6 +149,7 @@ const merchantSchema = new mongoose.Schema({
   password: {
     type: String,
     require: true,
+    default: md5("123"),
   },
   name: {
     type: String,
@@ -117,13 +169,13 @@ const merchantSchema = new mongoose.Schema({
     enum: [0, 1],
     //0:eat     1: drink
   },
-  daypart: {
-    type: Number,
-    enum: [0, 1, 2],
+  dayPart: {
+    type: [Number],
+    required: true,
     //0: Morning, 1:Afternoon 2:Evening
   },
   openTime: {
-    type: [String],
+    type: openTimeSchema,
     require: true,
   },
   phone: {
@@ -136,7 +188,6 @@ const merchantSchema = new mongoose.Schema({
   },
   category: {
     type: [categorySchema],
-    require: true,
   },
   reviews: {
     type: [reviewSchema],
@@ -144,7 +195,7 @@ const merchantSchema = new mongoose.Schema({
   status: {
     type: String,
     enum: ["open", "close", "suspend"],
-    default: "open",
+    default: "close",
     require: true,
   },
   dateCreate: {

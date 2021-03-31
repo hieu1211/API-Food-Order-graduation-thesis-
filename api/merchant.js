@@ -9,19 +9,21 @@ const {
 const { loginValidation } = require("../middleware/auth.validate");
 const md5 = require("md5");
 
-router.post("/register", async (req, res) => {
-  // if(req.permission!=='manager') return res.status(401).send('Unauthorized')
+router.post("/register", jwtValidation, async (req, res) => {
+  console.log(req.body);
+  if (req.permission !== "manager") return res.status(401).send("Unauthorized");
   const { error } = registerMerchantValidation(req.body);
+  console.log(error);
   if (error) return res.status(400).send(error.details[0].message);
   const merchant = new Merchant({
     ...req.body,
-    password: md5(req.body.password),
   });
+  console.log(merchant);
   try {
     const savedMerchant = await merchant.save();
     return res.send(savedMerchant);
   } catch (err) {
-    return res.send(err);
+    return res.status(200).send(err);
   }
 });
 
@@ -50,7 +52,7 @@ router.get("/", jwtValidation, async (req, res) => {
       res.send(merchants);
     } else {
       const merchants = await Merchant.find({}).select([
-        "-username",
+        "-email",
         "-password",
         "-representative",
       ]);
@@ -74,13 +76,13 @@ router.get("/search", jwtValidation, async (req, res) => {
       } else {
         const merchants = await Merchant.find({
           name: new RegExp(nameMerchant, "i"),
-        }).select(["-username", "-password", "-representative"]);
+        }).select(["-email", "-password", "-representative"]);
         res.send(merchants);
       }
     } else if (nameFood) {
       const merchants = await Merchant.find({
         "category.foods.name": new RegExp(nameFood, "i"),
-      }).select(["-username", "-password", "-representative"]);
+      }).select(["-email", "-password", "-representative"]);
       res.send(merchants);
     } else res.send({});
   } catch (err) {
@@ -95,7 +97,7 @@ router.get("/:id", jwtValidation, async (req, res) => {
       (req.permission !== "merchant" || req._id !== parseInt(req.params.id))
     ) {
       const merchants = await Merchant.findOne({ _id: req.params.id }).select([
-        "-username",
+        "-email",
         "-password",
         "-representative",
       ]);
