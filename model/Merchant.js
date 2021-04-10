@@ -48,6 +48,17 @@ const categorySchema = new mongoose.Schema({
   },
 });
 
+const identitySchema = new mongoose.Schema({
+  fontImg: {
+    type: String,
+    required: true,
+  },
+  backImg: {
+    type: String,
+    required: true,
+  },
+});
+
 const representativeSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -58,9 +69,7 @@ const representativeSchema = new mongoose.Schema({
     require: true,
   },
   identity: {
-    type: String,
-    minlength: 9,
-    maxlength: 12,
+    type: identitySchema,
     require: true,
   },
   phone: {

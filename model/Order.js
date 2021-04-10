@@ -1,5 +1,14 @@
 const mongoose = require("mongoose");
 
+const detailSchema = new mongoose.Schema({
+  food: [String],
+  count: Number,
+  price: Number,
+  fee: Number,
+  discount: Number,
+  total: Number,
+});
+
 const orderSchema = new mongoose.Schema({
   userOrder: {
     type: mongoose.ObjectId,
@@ -25,7 +34,7 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["pending", "complete", "cancel"],
+    enum: ["processing", "complete", "cancel"],
   },
   detail: {
     type: detailSchema,
@@ -33,14 +42,4 @@ const orderSchema = new mongoose.Schema({
   },
   report: String,
 });
-
-const detailSchema = new mongoose.Schema({
-  food: [String],
-  count: Number,
-  price: Number,
-  fee: Number,
-  discount: Number,
-  total: Number,
-});
-
 module.exports = mongoose.model("Order", orderSchema);

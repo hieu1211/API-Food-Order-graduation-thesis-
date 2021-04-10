@@ -1,7 +1,22 @@
 const mongoose = require("mongoose");
 
+const identitySchema = new mongoose.Schema({
+  number: {
+    type: String,
+    required: true,
+  },
+  fontImg: {
+    type: String,
+    required: true,
+  },
+  backImg: {
+    type: String,
+    required: true,
+  },
+});
+
 const partnerSchema = new mongoose.Schema({
-  username: {
+  email: {
     type: String,
     unique: true,
     minlength: 6,
@@ -12,27 +27,19 @@ const partnerSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
-  info: {
-    type: infoSchema,
-    require: true,
-  },
-});
-
-const infoSchema = new mongoose.Schema({
   name: {
     type: String,
     require: true,
     maxlength: 30,
   },
   identity: {
-    type: Number,
-    minlength: 9,
-    maxlength: 12,
+    type: identitySchema,
     require: true,
   },
   address: {
     type: String,
     require: true,
+    maxlength: 50,
   },
   gender: {
     type: String,
@@ -53,5 +60,7 @@ const infoSchema = new mongoose.Schema({
     default: Date.now,
   },
 });
+
+const infoSchema = new mongoose.Schema({});
 
 module.exports = mongoose.model("Partner", partnerSchema);
