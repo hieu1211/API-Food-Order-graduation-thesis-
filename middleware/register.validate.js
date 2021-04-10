@@ -129,7 +129,10 @@ const registerUserValidation = (data) => {
       name: Joi.string().max(30).required(),
       gender: Joi.string().valid("male", "female").required(),
       avt: Joi.string().required(),
-      phone: Joi.string().max(10).required(),
+      phone: Joi.string().min(10).max(10).required(),
+      email: Joi.string()
+        .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
+        .required(),
     }).required(),
   });
   return schema.validate(data);

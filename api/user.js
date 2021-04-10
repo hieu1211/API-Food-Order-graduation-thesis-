@@ -6,6 +6,7 @@ const jwtValidation = require("../middleware/jwt.validate");
 const User = require("../model/User");
 const md5 = require("md5");
 const jwt = require("jsonwebtoken");
+const { request, response } = require("express");
 
 //User register
 router.post("/register", async (req, res) => {
@@ -20,12 +21,33 @@ router.post("/register", async (req, res) => {
   }
 });
 
+//User signup
+router.post("/signup", async (request, response) => {
+  const signUpUser = new User({
+    username: request.body.username,
+    password: md5(request.body.password),
+  });
+
+  signUpUser
+    .save()
+    .then((data) => {
+      response.json(data);
+    })
+    .catch((err) => {
+      response.json(err);
+    });
+});
+
 //User login
 router.post("/login", async (req, res) => {
   const { error } = loginValidation(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  if (error) {
+    return res.status(400).send(error.details[0].message);
+  }
   const user = await User.findOne({ username: req.body.username });
-  if (!user) return res.status(400).send("Username doesn't exist!");
+  if (!user) {
+    return res.status(400).send("Username doesn't exist!");
+  }
   if (user.password !== md5(req.body.password))
     return res.status(400).send("Password is wrong!");
   const token = jwt.sign(

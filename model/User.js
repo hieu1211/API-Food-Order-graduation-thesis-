@@ -20,6 +20,10 @@ const infoSchema = new mongoose.Schema({
     length: 10,
     require: true,
   },
+  email: {
+    type: String,
+    require: true,
+  },
 });
 
 const userSchema = new mongoose.Schema({
