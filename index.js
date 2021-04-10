@@ -10,6 +10,7 @@ const apiMerchant = require("./api/merchant");
 const apiUser = require("./api/user");
 const apiManager = require("./api/manager");
 dotenv.config();
+app.use(express.urlencoded());
 app.use(express.json());
 
 //Connect to DB

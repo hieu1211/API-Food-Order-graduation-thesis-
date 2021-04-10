@@ -141,6 +141,9 @@ const registerUserValidation = (data) => {
         .min(10 ** 7)
         .max(10 ** 9 - 1)
         .required(),
+      email: Joi.string()
+        .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
+        .required(),
     }).required(),
   });
   return schema.validate(data);
