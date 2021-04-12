@@ -6,47 +6,47 @@ const partnerSchema = new mongoose.Schema({
     unique: true,
     minlength: 6,
     maxlength: 30,
-    require: true,
+    required: true,
   },
   password: {
     type: String,
-    require: true,
+    required: true,
   },
   info: {
     type: infoSchema,
-    require: true,
+    required: true,
   },
 });
 
 const infoSchema = new mongoose.Schema({
   name: {
     type: String,
-    require: true,
+    required: true,
     maxlength: 30,
   },
   identity: {
     type: Number,
     minlength: 9,
     maxlength: 12,
-    require: true,
+    required: true,
   },
   address: {
     type: String,
-    require: true,
+    required: true,
   },
   gender: {
     type: String,
     enum: ["male", "female"],
-    require: true,
+    required: true,
   },
   avt: {
     type: String,
-    require: true,
+    required: true,
   },
   phone: {
     type: String,
     length: 10,
-    require: true,
+    required: true,
   },
   dateCreate: {
     type: String,

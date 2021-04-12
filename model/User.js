@@ -4,25 +4,25 @@ const infoSchema = new mongoose.Schema({
   name: {
     type: String,
     maxlength: 30,
-    require: true,
+    default: "",
   },
   gender: {
     type: String,
-    enum: ["male", "female"],
-    require: true,
+    enum: ["null", "male", "female"],
+    default: "null",
   },
   avt: {
     type: String,
-    require: true,
+    default: "",
   },
   phone: {
     type: String,
     length: 10,
-    require: true,
+    default: "",
   },
   email: {
     type: String,
-    require: true,
+    default: "",
   },
 });
 
@@ -32,15 +32,16 @@ const userSchema = new mongoose.Schema({
     unique: true,
     minlength: 6,
     maxlength: 30,
-    require: true,
+    required: true,
   },
   password: {
     type: String,
-    require: true,
+    required: true,
   },
   info: {
     type: infoSchema,
-    require: true,
+    required: true,
+    default: {},
   },
   favoriteMerchant: {
     type: [mongoose.ObjectId],

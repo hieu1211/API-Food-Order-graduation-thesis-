@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 const orderSchema = new mongoose.Schema({
   userOrder: {
     type: mongoose.ObjectId,
-    require: true,
+    required: true,
     ref: "User",
   },
   timeOrder: {
@@ -20,7 +20,7 @@ const orderSchema = new mongoose.Schema({
   },
   merchant: {
     type: mongoose.ObjectId,
-    require: true,
+    required: true,
     ref: "Merchant",
   },
   status: {
@@ -29,7 +29,7 @@ const orderSchema = new mongoose.Schema({
   },
   detail: {
     type: detailSchema,
-    require: true,
+    required: true,
   },
   report: String,
 });

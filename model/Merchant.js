@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 const reviewSchema = new mongoose.Schema({
   user: {
     type: mongoose.ObjectId,
-    require: true,
+    required: true,
     ref: "User",
   },
   star: {
@@ -14,7 +14,7 @@ const reviewSchema = new mongoose.Schema({
   },
   content: {
     type: String,
-    require: true,
+    required: true,
   },
   date: {
     type: String,
@@ -26,12 +26,12 @@ const foodSchema = new mongoose.Schema({
   name: {
     type: String,
     maxlength: 50,
-    require: true,
+    required: true,
   },
   price: {
     type: Number,
     maxlength: 8,
-    require: true,
+    required: true,
   },
   img: Buffer,
 });
@@ -40,33 +40,33 @@ const categorySchema = new mongoose.Schema({
   name: {
     type: String,
     maxlength: 50,
-    require: true,
+    required: true,
   },
   foods: {
     type: [foodSchema],
-    require: true,
+    required: true,
   },
 });
 
 const representativeSchema = new mongoose.Schema({
   name: {
     type: String,
-    require: true,
+    required: true,
   },
   address: {
     type: String,
-    require: true,
+    required: true,
   },
   identity: {
     type: String,
     minlength: 9,
     maxlength: 12,
-    require: true,
+    required: true,
   },
   phone: {
     type: String,
     length: 10,
-    require: true,
+    required: true,
   },
 });
 
@@ -74,68 +74,68 @@ const locationSchema = new mongoose.Schema({
   address: {
     type: String,
     maxlength: 150,
-    require: true,
+    required: true,
   },
   district: {
     type: Number,
     min: 1,
     max: 12,
-    require: true,
+    required: true,
   },
   lat: {
     type: String,
-    require: true,
+    required: true,
   },
   lng: {
     type: String,
-    require: true,
+    required: true,
   },
 });
 
 const timeSchema = new mongoose.Schema({
   label: {
     type: String,
-    require: true,
+    required: true,
   },
   enable: {
     type: Boolean,
-    require: true,
+    required: true,
     default: true,
   },
   time: {
     type: String,
-    require: true,
+    required: true,
   },
 });
 
 const openTimeSchema = new mongoose.Schema({
   mon: {
     type: timeSchema,
-    require: true,
+    required: true,
   },
   tue: {
     type: timeSchema,
-    require: true,
+    required: true,
   },
   wed: {
     type: timeSchema,
-    require: true,
+    required: true,
   },
   thu: {
     type: timeSchema,
-    require: true,
+    required: true,
   },
   fri: {
     type: timeSchema,
-    require: true,
+    required: true,
   },
   sat: {
     type: timeSchema,
-    require: true,
+    required: true,
   },
   sun: {
     type: timeSchema,
-    require: true,
+    required: true,
   },
 });
 const merchantSchema = new mongoose.Schema({
@@ -144,24 +144,24 @@ const merchantSchema = new mongoose.Schema({
     unique: true,
     minlength: 6,
     maxlength: 30,
-    require: true,
+    required: true,
   },
   password: {
     type: String,
-    require: true,
+    required: true,
     default: md5("123"),
   },
   name: {
     type: String,
-    require: true,
+    required: true,
   },
   representative: {
     type: representativeSchema,
-    require: true,
+    required: true,
   },
   location: {
     type: locationSchema,
-    require: true,
+    required: true,
   },
   typeFood: {
     type: Number,
@@ -176,15 +176,15 @@ const merchantSchema = new mongoose.Schema({
   },
   openTime: {
     type: openTimeSchema,
-    require: true,
+    required: true,
   },
   phone: {
     type: String,
-    require: true,
+    required: true,
   },
   avt: {
     type: String,
-    require: true,
+    required: true,
   },
   category: {
     type: [categorySchema],
@@ -196,7 +196,7 @@ const merchantSchema = new mongoose.Schema({
     type: String,
     enum: ["open", "close", "suspend"],
     default: "close",
-    require: true,
+    required: true,
   },
   dateCreate: {
     type: String,
@@ -206,7 +206,7 @@ const merchantSchema = new mongoose.Schema({
     type: Number,
     default: 10,
     maxlength: 3,
-    require: true,
+    required: true,
   },
 });
 
