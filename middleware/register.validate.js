@@ -24,15 +24,11 @@ const registerMerchantValidation = (data) => {
         "string.min": "Số CMND không hợp lệ",
         "string.max": "Số CMND không hợp lệ",
       }),
-      phone: Joi.number()
-        .min(10 ** 7)
-        .max(10 ** 9 - 1)
-        .required()
-        .messages({
-          "number.empty": "Số điện thoại đại diện không được để trống",
-          "number.min": "Số điện thoại người đại diện không hợp lệ",
-          "number.max": "Số điện thoại người đại diện không hợp lệ",
-        }),
+      phone: Joi.string().max(10).required().messages({
+        "number.empty": "Số điện thoại đại diện không được để trống",
+        "number.min": "Số điện thoại người đại diện không hợp lệ",
+        "number.max": "Số điện thoại người đại diện không hợp lệ",
+      }),
     }).messages({ "object.base": "Thiếu thông tin người đại diện" }),
     location: Joi.object({
       address: Joi.string().max(150).required().messages({
@@ -54,15 +50,11 @@ const registerMerchantValidation = (data) => {
         "array.includesRequiredUnknowns":
           "Thời điểm hoạt động trong ngày không được để trống",
       }),
-    phone: Joi.number()
-      .min(10 ** 7)
-      .max(10 ** 9 - 1)
-      .required()
-      .messages({
-        "number.empty": "Số điện thoại quán không được để trống",
-        "number.min": "Số điện thoại quán đại diện không hợp lệ",
-        "number.max": "Số điện thoại quán đại diện không hợp lệ",
-      }),
+    phone: Joi.string().max(10).required().messages({
+      "number.empty": "Số điện thoại quán không được để trống",
+      "number.min": "Số điện thoại quán đại diện không hợp lệ",
+      "number.max": "Số điện thoại quán đại diện không hợp lệ",
+    }),
     status: Joi.string().valid("open", "close", "suspend"),
     deduct: Joi.number().max(100),
     openTime: Joi.object({
@@ -163,9 +155,56 @@ const registerManagerValidation = (data) => {
   return schema.validate(data);
 };
 
+const registerPartnerValidation = (data) => {
+  const schema = Joi.object({
+    email: Joi.string()
+      .min(6)
+      .max(30)
+      .required()
+      .messages({ "string.empty": "Email không được để trống" }),
+    password: Joi.string(),
+    name: Joi.string()
+      .required()
+      .max(30)
+      .messages({ "string.empty": "Tên không được để trống" }),
+    identity: Joi.object({
+      number: Joi.string().min(9).max(12).required().messages({
+        "string.empty": "Số CMND người đại diện không được để trống",
+        "string.min": "Số CMND không hợp lệ",
+        "string.max": "Số CMND không hợp lệ",
+      }),
+      fontImg: Joi.string().required().messages({
+        "string.empty": "Ảnh CMND không được để trống",
+      }),
+      backImg: Joi.string().required().messages({
+        "string.empty": "Ảnh CMND không được để trống",
+      }),
+    })
+      .required()
+      .messages({
+        "any.required": "Ảnh CMND không được để trống",
+      }),
+    address: Joi.string()
+      .max(30)
+      .required()
+      .messages({ "string.empty": "Địa chỉ không được để trống" }),
+    gender: Joi.string().valid("male", "female").required(),
+    avt: Joi.string().required().messages({
+      "string.empty": "Ảnh đại diện không được để trống",
+    }),
+    phone: Joi.string().min(10).max(10).required().messages({
+      "number.empty": "Số điện thoại đại diện không được để trống",
+      "number.min": "Số điện thoại người đại diện không hợp lệ",
+      "number.max": "Số điện thoại người đại diện không hợp lệ",
+    }),
+  });
+  return schema.validate(data);
+};
+
 module.exports = {
   registerMerchantValidation,
   registerUserValidation,
   registerManagerValidation,
+  registerPartnerValidation,
   signupUserValidation,
 };
