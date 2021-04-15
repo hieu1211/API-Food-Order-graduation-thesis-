@@ -21,18 +21,19 @@ const partnerSchema = new mongoose.Schema({
     unique: true,
     minlength: 6,
     maxlength: 30,
-    require: true,
+    required: true,
   },
   password: {
     type: String,
-    require: true,
+    required: true,
   },
   name: {
     type: String,
-    require: true,
+    required: true,
     maxlength: 30,
   },
   identity: {
+
     type: identitySchema,
     require: true,
   },
@@ -44,16 +45,16 @@ const partnerSchema = new mongoose.Schema({
   gender: {
     type: String,
     enum: ["male", "female"],
-    require: true,
+    required: true,
   },
   avt: {
     type: String,
-    require: true,
+    required: true,
   },
   phone: {
     type: String,
     length: 10,
-    require: true,
+    required: true,
   },
   dateCreate: {
     type: String,

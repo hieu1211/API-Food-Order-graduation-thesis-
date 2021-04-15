@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const { loginValidation } = require("../middleware/auth.validate");
-const { registerUserValidation } = require("../middleware/register.validate");
+const {
+  registerUserValidation,
+  signupUserValidation,
+} = require("../middleware/register.validate");
 const jwtValidation = require("../middleware/jwt.validate");
 const User = require("../model/User");
 const md5 = require("md5");
@@ -22,20 +25,21 @@ router.post("/register", async (req, res) => {
 });
 
 //User signup
-router.post("/signup", async (request, response) => {
-  const signUpUser = new User({
-    username: request.body.username,
-    password: md5(request.body.password),
-  });
+router.post("/signup", async (req, res) => {
+  const { error } = signupUserValidation(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
 
-  signUpUser
-    .save()
-    .then((data) => {
-      response.json(data);
-    })
-    .catch((err) => {
-      response.json(err);
-    });
+  const signUpUser = new User({
+    username: req.body.username,
+    password: md5(req.body.password),
+  });
+  try {
+    const savedUser = await signUpUser.save();
+    res.send(savedUser);
+  } catch (error) {
+    console.log(error);
+    res.status(400).send(error);
+  }
 });
 
 //User login

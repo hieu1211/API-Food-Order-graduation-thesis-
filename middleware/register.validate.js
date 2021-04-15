@@ -129,11 +129,20 @@ const registerUserValidation = (data) => {
       name: Joi.string().max(30).required(),
       gender: Joi.string().valid("male", "female").required(),
       avt: Joi.string().required(),
-      phone: Joi.string().min(10).max(10).required(),
-      email: Joi.string()
-        .email({ minDomainSegments: 2, tlds: { allow: ["com", "net"] } })
+      phone: Joi.number()
+        .min(10 ** 7)
+        .max(10 ** 9 - 1)
         .required(),
-    }).required(),
+      email: Joi.string().email().min(8).max(254).lowercase().trim().required(),
+    }),
+  });
+  return schema.validate(data);
+};
+
+const signupUserValidation = (data) => {
+  const schema = Joi.object({
+    username: Joi.string().min(6).max(128).trim().required(),
+    password: Joi.string().max(128).trim().required(),
   });
   return schema.validate(data);
 };
@@ -197,4 +206,5 @@ module.exports = {
   registerUserValidation,
   registerManagerValidation,
   registerPartnerValidation,
+  signupUserValidation,
 };
