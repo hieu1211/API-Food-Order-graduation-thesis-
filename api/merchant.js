@@ -31,17 +31,33 @@ router.post("/login", async (req, res) => {
   const { error } = loginValidation(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   try {
-    const merchant = await merchant.findOne({
-      ...req.body,
-      password: md5(req.body.password),
+    const merchant = await Merchant.findOne({
+      email: req.body.email,
     });
-    jwt.sign(
+    if (merchant.password !== md5(req.body.password))
+      return res.status(400).send("Password is wrong!");
+    const token = jwt.sign(
       { _id: merchant._id, permission: "merchant" },
       process.env.SECRET_KEY
     );
-    res.status(200).header({ auth_token: token }).send();
+    res.status(200).header({ auth_token: token }).send(token);
   } catch (err) {
     return res.send(err);
+  }
+});
+
+//check Authen after login
+router.post("/auth", (req, res) => {
+  try {
+    const payload = jwt.verify(
+      req.header("auth_token"),
+      process.env.SECRET_KEY
+    );
+    if (!payload || payload.permission !== "merchant")
+      res.status(400).send("Unauthorized!");
+    else res.send("pass");
+  } catch (error) {
+    res.status(400).send("Unauthorized!");
   }
 });
 
