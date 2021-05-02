@@ -49,6 +49,10 @@ const categorySchema = new mongoose.Schema({
 });
 
 const identitySchema = new mongoose.Schema({
+  number: {
+    type: String,
+    required: true,
+  },
   fontImg: {
     type: String,
     required: true,

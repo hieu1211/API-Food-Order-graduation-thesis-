@@ -1,3 +1,4 @@
+const { object } = require("@hapi/joi");
 const Joi = require("@hapi/joi");
 Joi.objectId = require("joi-objectid")(Joi);
 
@@ -19,10 +20,14 @@ const registerMerchantValidation = (data) => {
       address: Joi.string().required().messages({
         "string.empty": "Đia chỉ người đại diện không được để trống",
       }),
-      identity: Joi.string().min(9).max(12).required().messages({
-        "string.empty": "Số CMND  người đại diện không được để trống",
-        "string.min": "Số CMND không hợp lệ",
-        "string.max": "Số CMND không hợp lệ",
+      identity: Joi.object({
+        number: Joi.string().min(9).max(12).required().messages({
+          "string.empty": "Số CMND  người đại diện không được để trống",
+          "string.min": "Số CMND không hợp lệ",
+          "string.max": "Số CMND không hợp lệ",
+        }),
+        fontImg: Joi.string(),
+        backImg: Joi.string(),
       }),
       phone: Joi.string().max(10).required().messages({
         "number.empty": "Số điện thoại đại diện không được để trống",

@@ -6,11 +6,11 @@ const jwtValidation = require("../middleware/jwt.validate");
 const {
   registerMerchantValidation,
 } = require("../middleware/register.validate");
-const { loginValidation } = require("../middleware/auth.validate");
+const { loginValidationEmail } = require("../middleware/auth.validate");
 const md5 = require("md5");
 
 router.post("/register", jwtValidation, async (req, res) => {
-  console.log(req.body);
+  console.log(req.permission);
   if (req.permission !== "manager") return res.status(401).send("Unauthorized");
   const { error } = registerMerchantValidation(req.body);
   console.log(error);
@@ -28,7 +28,7 @@ router.post("/register", jwtValidation, async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  const { error } = loginValidation(req.body);
+  const { error } = loginValidationEmail(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   try {
     const merchant = await Merchant.findOne({
@@ -53,6 +53,7 @@ router.post("/auth", (req, res) => {
       req.header("auth_token"),
       process.env.SECRET_KEY
     );
+    console.log(payload);
     if (!payload || payload.permission !== "merchant")
       res.status(400).send("Unauthorized!");
     else res.send("pass");
@@ -112,11 +113,13 @@ router.get("/:id", jwtValidation, async (req, res) => {
       req.permission !== "manager" &&
       (req.permission !== "merchant" || req._id !== parseInt(req.params.id))
     ) {
+      console.log(req.params.id);
       const merchants = await Merchant.findOne({ _id: req.params.id }).select([
         "-email",
         "-password",
         "-representative",
       ]);
+
       res.send(merchants);
     } else {
       const merchants = await Merchant.findOne({ _id: req.params.id });
