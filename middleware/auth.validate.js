@@ -9,7 +9,7 @@ const loginValidation = (data) => {
   return schema.validate(data);
 };
 
-const loginValidationEmail = (data) => {
+const loginValidationMerchant = (data) => {
   const schema = Joi.object({
     email: Joi.string().min(2).max(30).required(),
     password: Joi.string().required(),
@@ -19,5 +19,5 @@ const loginValidationEmail = (data) => {
 
 module.exports = {
   loginValidation,
-  loginValidationEmail,
+  loginValidationMerchant,
 };

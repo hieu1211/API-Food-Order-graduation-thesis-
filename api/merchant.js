@@ -6,7 +6,7 @@ const jwtValidation = require("../middleware/jwt.validate");
 const {
   registerMerchantValidation,
 } = require("../middleware/register.validate");
-const { loginValidationEmail } = require("../middleware/auth.validate");
+const { loginValidationMerchant } = require("../middleware/auth.validate");
 const md5 = require("md5");
 
 router.post("/register", jwtValidation, async (req, res) => {
@@ -28,19 +28,24 @@ router.post("/register", jwtValidation, async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  const { error } = loginValidationEmail(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  const { error } = loginValidationMerchant(req.body);
+  if (error) {
+    return res.status(400).send(error.details[0].message);
+  }
+
   try {
     const merchant = await Merchant.findOne({
       email: req.body.email,
     });
-    if (merchant.password !== md5(req.body.password))
+    if (merchant.password !== md5(req.body.password)) {
       return res.status(400).send("Password is wrong!");
+    }
     const token = jwt.sign(
       { _id: merchant._id, permission: "merchant" },
       process.env.SECRET_KEY
     );
-    res.status(200).header({ auth_token: token }).send(token);
+    const id = merchant._id;
+    res.status(200).header({ auth_token: token }).send({ token, id });
   } catch (err) {
     return res.send(err);
   }
