@@ -33,7 +33,14 @@ const foodSchema = new mongoose.Schema({
     maxlength: 8,
     required: true,
   },
-  img: Buffer,
+  img: {
+    type: String,
+  },
+  status: {
+    type: Boolean,
+    required: true,
+    default: true,
+  },
 });
 
 const categorySchema = new mongoose.Schema({
@@ -177,11 +184,6 @@ const merchantSchema = new mongoose.Schema({
     required: true,
     enum: [0, 1],
     //0:eat     1: drink
-  },
-  dayPart: {
-    type: [Number],
-    required: true,
-    //0: Morning, 1:Afternoon 2:Evening
   },
   openTime: {
     type: openTimeSchema,
