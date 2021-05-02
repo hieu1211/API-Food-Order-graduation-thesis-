@@ -24,7 +24,9 @@ app.use("/api/users", apiUser);
 app.use("/api/managers", apiManager);
 app.use("/api/partners", apiPartner);
 
-app.listen(4000, () => console.log("server listen on port 4000"));
+app.listen(process.env.PORT || 4000, () =>
+  console.log("server listen on port 4000")
+);
 // const Nexmo = require("nexmo");
 // const nexmo = new Nexmo({
 //   apiKey: "0a88b36f",
