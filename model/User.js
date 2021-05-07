@@ -1,5 +1,21 @@
 const mongoose = require("mongoose");
 
+const locationSchema = new mongoose.Schema({
+  address: {
+    type: String,
+    maxlength: 150,
+    required: true,
+  },
+  lat: {
+    type: String,
+    required: true,
+  },
+  lng: {
+    type: String,
+    required: true,
+  },
+});
+
 const infoSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -23,6 +39,9 @@ const infoSchema = new mongoose.Schema({
   email: {
     type: String,
     default: "",
+  },
+  location: {
+    type: locationSchema,
   },
 });
 

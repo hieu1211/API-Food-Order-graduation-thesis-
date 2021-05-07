@@ -61,21 +61,6 @@ router.post("/login", async (req, res) => {
   res.status(200).header({ auth_token: token }).send(token);
 });
 
-//Query user by id
-router.get("/:id", jwtValidation, async (req, res) => {
-  if (
-    req.permission !== "manager" &&
-    (req.permission !== "user" || req._id !== req.params.id)
-  )
-    return res.status(401).send("Unauthorized");
-  try {
-    const user = await User.find({ _id: req.params.id });
-    res.send(user);
-  } catch (err) {
-    res.status(400).send(err);
-  }
-});
-
 //Query all user
 router.get("/", async (req, res) => {
   try {
@@ -100,4 +85,35 @@ router.post("/auth", (req, res) => {
   }
 });
 
+router.get("/profile", jwtValidation, async (req, res) => {
+  try {
+    console.log("asdasd");
+    const payload = jwt.verify(
+      req.header("auth_token"),
+      process.env.SECRET_KEY
+    );
+    const profile = await User.findOne({ _id: payload._id }).select([
+      "-password",
+    ]);
+    res.send(JSON.stringify(profile));
+  } catch (error) {
+    res.status(400).send("can't find User");
+  }
+});
+
+//Query user by id
+router.get("/:id", jwtValidation, async (req, res) => {
+  console.log("asd");
+  if (
+    req.permission !== "manager" &&
+    (req.permission !== "user" || req._id !== req.params.id)
+  )
+    return res.status(401).send("Unauthorized");
+  try {
+    const user = await User.find({ _id: req.params.id });
+    res.send(user);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
 module.exports = router;
