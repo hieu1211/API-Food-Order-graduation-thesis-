@@ -1,5 +1,23 @@
 const mongoose = require("mongoose");
 
+mongoose.set("useFindAndModify", false);
+
+const locationSchema = new mongoose.Schema({
+  address: {
+    type: String,
+    maxlength: 150,
+    default: "",
+  },
+  lat: {
+    type: String,
+    default: "",
+  },
+  lng: {
+    type: String,
+    default: "",
+  },
+});
+
 const infoSchema = new mongoose.Schema({
   name: {
     type: String,
@@ -8,8 +26,8 @@ const infoSchema = new mongoose.Schema({
   },
   gender: {
     type: String,
-    enum: ["null", "male", "female"],
-    default: "null",
+    enum: ["", "male", "female"],
+    default: "",
   },
   avt: {
     type: String,
@@ -23,6 +41,11 @@ const infoSchema = new mongoose.Schema({
   email: {
     type: String,
     default: "",
+  },
+  location: {
+    type: locationSchema,
+    required: true,
+    default: {},
   },
 });
 

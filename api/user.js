@@ -61,29 +61,56 @@ router.post("/login", async (req, res) => {
   res.status(200).header({ auth_token: token }).send(token);
 });
 
-//Query user by id
-router.get("/:id", jwtValidation, async (req, res) => {
-  if (
-    req.permission !== "manager" &&
-    (req.permission !== "user" || req._id !== req.params.id)
-  )
-    return res.status(401).send("Unauthorized");
-  try {
-    const user = await User.find({ _id: req.params.id });
-    res.send(user);
-  } catch (err) {
-    res.status(400).send(err);
+router.post("/changeprofile", jwtValidation, async (req, res) => {
+  const newData = req.body;
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+  if (payload.permission === "user") {
+    const preUser = await User.findOne({ _id: payload._id });
+    let user = await User.findOneAndUpdate(
+      { _id: payload._id },
+      {
+        $set: {
+          info: {
+            ...preUser.info._doc,
+            ...newData,
+          },
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    res.send(JSON.stringify(user));
+    return;
   }
+  res.status(400).send("Can't update profile");
 });
 
-//Query all user
-router.get("/", async (req, res) => {
-  try {
-    const user = await User.find({});
-    res.send(user);
-  } catch (err) {
-    res.status(400).send(err);
+router.post("/changephone", jwtValidation, async (req, res) => {
+  const newData = req.body;
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+  if (payload.permission === "user") {
+    // console.log(payload._id, newData)
+    try {
+      let savedUser = await User.findOneAndUpdate(
+        { _id: payload._id, password: md5(newData.pass) },
+        {
+          $set: {
+            "info.phone": newData.phone,
+          },
+        },
+        {
+          new: true,
+        }
+      );
+      console.log("1222222222222222", savedUser);
+      res.send(JSON.stringify(savedUser));
+      return;
+    } catch {
+      res.status(400).send("Can't update phone");
+    }
   }
+  res.status(400).send("Can't update phone");
 });
 
 router.post("/auth", (req, res) => {
@@ -100,4 +127,45 @@ router.post("/auth", (req, res) => {
   }
 });
 
+//Query all user
+router.get("/", async (req, res) => {
+  try {
+    const user = await User.find({});
+    res.send(user);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+router.get("/profile", jwtValidation, async (req, res) => {
+  try {
+    console.log("asdasd");
+    const payload = jwt.verify(
+      req.header("auth_token"),
+      process.env.SECRET_KEY
+    );
+    const profile = await User.findOne({ _id: payload._id }).select([
+      "-password",
+    ]);
+    res.send(JSON.stringify(profile));
+  } catch (error) {
+    res.status(400).send("can't find User");
+  }
+});
+
+//Query user by id
+router.get("/:id", jwtValidation, async (req, res) => {
+  console.log("asd");
+  if (
+    req.permission !== "manager" &&
+    (req.permission !== "user" || req._id !== req.params.id)
+  )
+    return res.status(401).send("Unauthorized");
+  try {
+    const user = await User.find({ _id: req.params.id });
+    res.send(user);
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
 module.exports = router;
