@@ -39,7 +39,7 @@ const detailSchema = new mongoose.Schema({
 });
 
 const orderSchema = new mongoose.Schema({
-  userOrder: {
+  userOrderId: {
     type: mongoose.ObjectId,
     required: true,
     ref: "User",
@@ -52,11 +52,11 @@ const orderSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
-  deliver: {
+  deliverId: {
     type: mongoose.ObjectId,
     ref: "Partner",
   },
-  merchant: {
+  merchantId: {
     type: mongoose.ObjectId,
     required: true,
     ref: "Merchant",
