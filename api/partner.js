@@ -12,12 +12,10 @@ const md5 = require("md5");
 router.post("/register", jwtValidation, async (req, res) => {
   if (req.permission !== "manager") return res.status(401).send("Unauthorized");
   const { error } = registerPartnerValidation(req.body);
-  console.log(error);
   if (error) return res.status(400).send(error.details[0].message);
   const partner = new Partner({
     ...req.body,
   });
-  console.log(partner);
   try {
     const savedPartner = await partner.save();
     return res.send(savedPartner);

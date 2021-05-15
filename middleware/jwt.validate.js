@@ -12,6 +12,7 @@ module.exports = function (req, res, next) {
     }
     next();
   } catch (error) {
+    console.log(error);
     res.status(401).send("Unauthorized!");
   }
 };

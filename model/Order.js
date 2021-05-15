@@ -1,16 +1,45 @@
 const mongoose = require("mongoose");
 
+const foodSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+  },
+  price: {
+    type: Number,
+    required: true,
+  },
+  total: {
+    type: Number,
+    required: true,
+  },
+});
+
 const detailSchema = new mongoose.Schema({
-  food: [String],
-  count: Number,
-  price: Number,
-  fee: Number,
-  discount: Number,
-  total: Number,
+  foods: {
+    type: [foodSchema],
+    required: true,
+  },
+  fee: {
+    type: Number,
+    required: true,
+  },
+  discount: {
+    type: Number,
+    required: true,
+  },
+  total: {
+    type: Number,
+    required: true,
+  },
 });
 
 const orderSchema = new mongoose.Schema({
-  userOrder: {
+  userOrderId: {
     type: mongoose.ObjectId,
     required: true,
     ref: "User",
@@ -23,11 +52,11 @@ const orderSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
-  deliver: {
+  deliverId: {
     type: mongoose.ObjectId,
     ref: "Partner",
   },
-  merchant: {
+  merchantId: {
     type: mongoose.ObjectId,
     required: true,
     ref: "Merchant",

@@ -10,15 +10,12 @@ const { loginValidationMerchant } = require("../middleware/auth.validate");
 const md5 = require("md5");
 
 router.post("/register", jwtValidation, async (req, res) => {
-  console.log(req.permission);
   if (req.permission !== "manager") return res.status(401).send("Unauthorized");
   const { error } = registerMerchantValidation(req.body);
-  console.log(error);
   if (error) return res.status(400).send(error.details[0].message);
   const merchant = new Merchant({
     ...req.body,
   });
-  console.log(merchant);
   try {
     const savedMerchant = await merchant.save();
     return res.send(savedMerchant);
@@ -58,7 +55,6 @@ router.post("/auth", (req, res) => {
       req.header("auth_token"),
       process.env.SECRET_KEY
     );
-    console.log(payload);
     if (!payload || payload.permission !== "merchant")
       res.status(400).send("Unauthorized!");
     else res.send("pass");
@@ -118,7 +114,6 @@ router.get("/:id", jwtValidation, async (req, res) => {
       req.permission !== "manager" &&
       (req.permission !== "merchant" || req._id !== parseInt(req.params.id))
     ) {
-      console.log(req.params.id);
       const merchants = await Merchant.findOne({ _id: req.params.id }).select([
         "-email",
         "-password",

@@ -9,7 +9,6 @@ const jwtValidation = require("../middleware/jwt.validate");
 const User = require("../model/User");
 const md5 = require("md5");
 const jwt = require("jsonwebtoken");
-const { request, response } = require("express");
 
 //User register
 router.post("/register", async (req, res) => {
@@ -37,7 +36,6 @@ router.post("/signup", async (req, res) => {
     const savedUser = await signUpUser.save();
     res.send(savedUser);
   } catch (error) {
-    console.log(error);
     res.status(400).send(error);
   }
 });
@@ -60,7 +58,10 @@ router.post("/login", async (req, res) => {
   );
   res.status(200).header({ auth_token: token }).send(token);
 });
+<<<<<<< HEAD
 
+=======
+>>>>>>> c1fa349aacc5bdaae33df3ab4706da603a6fd415
 router.post("/changeprofile", jwtValidation, async (req, res) => {
   const newData = req.body;
   const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
@@ -137,7 +138,10 @@ router.get("/", async (req, res) => {
 
 router.get("/profile", jwtValidation, async (req, res) => {
   try {
+<<<<<<< HEAD
     console.log("asdasd");
+=======
+>>>>>>> c1fa349aacc5bdaae33df3ab4706da603a6fd415
     const payload = jwt.verify(
       req.header("auth_token"),
       process.env.SECRET_KEY
@@ -153,7 +157,6 @@ router.get("/profile", jwtValidation, async (req, res) => {
 
 //Query user by id
 router.get("/:id", jwtValidation, async (req, res) => {
-  console.log("asd");
   if (
     req.permission !== "manager" &&
     (req.permission !== "user" || req._id !== req.params.id)
