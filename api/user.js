@@ -61,7 +61,6 @@ router.post("/login", async (req, res) => {
   res.status(200).header({ auth_token: token }).send(token);
 });
 
-<<<<<<< HEAD
 router.post("/changeprofile", jwtValidation, async (req, res) => {
   const newData = req.body;
   const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
@@ -91,7 +90,6 @@ router.post("/changephone", jwtValidation, async (req, res) => {
   const newData = req.body;
   const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
   if (payload.permission === "user") {
-    // console.log(payload._id, newData)
     try {
       let savedUser = await User.findOneAndUpdate(
         { _id: payload._id, password: md5(newData.pass) },
@@ -104,7 +102,6 @@ router.post("/changephone", jwtValidation, async (req, res) => {
           new: true,
         }
       );
-      console.log("1222222222222222", savedUser);
       res.send(JSON.stringify(savedUser));
       return;
     } catch {
@@ -128,8 +125,6 @@ router.post("/auth", (req, res) => {
   }
 });
 
-=======
->>>>>>> 1ca8383096753430d44ab4bbab014d35dd33aa77
 //Query all user
 router.get("/", async (req, res) => {
   try {
@@ -156,25 +151,6 @@ router.get("/profile", jwtValidation, async (req, res) => {
   }
 });
 
-<<<<<<< HEAD
-=======
-router.get("/profile", jwtValidation, async (req, res) => {
-  try {
-    console.log("asdasd");
-    const payload = jwt.verify(
-      req.header("auth_token"),
-      process.env.SECRET_KEY
-    );
-    const profile = await User.findOne({ _id: payload._id }).select([
-      "-password",
-    ]);
-    res.send(JSON.stringify(profile));
-  } catch (error) {
-    res.status(400).send("can't find User");
-  }
-});
-
->>>>>>> 1ca8383096753430d44ab4bbab014d35dd33aa77
 //Query user by id
 router.get("/:id", jwtValidation, async (req, res) => {
   console.log("asd");

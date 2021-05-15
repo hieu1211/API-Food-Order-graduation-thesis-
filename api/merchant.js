@@ -135,4 +135,56 @@ router.get("/:id", jwtValidation, async (req, res) => {
   }
 });
 
+router.post("/changecategory", jwtValidation, async (req, res) => {
+  const newData = req.body;
+  console.log(newData);
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+  if (payload.permission === "merchant") {
+    let merchant = await Merchant.findOneAndUpdate(
+      { _id: payload._id },
+      {
+        $set: {
+          category: newData,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    res.send(JSON.stringify(merchant));
+    return;
+  }
+  res.status(400).send("Can't update category");
+});
+
+router.post("/addcategory", jwtValidation, async (req, res) => {
+  const newCat = new Category({ ...req.body });
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+
+  if (payload.permission === "merchant") {
+    const preMerchant = await Merchant.findOne({ _id: payload._id });
+    preMerchant.category.push(newCat);
+    await preMerchant.save();
+
+    res.send(JSON.stringify(preMerchant));
+    return;
+  }
+  res.status(400).send("Can't add category");
+});
+
+router.post("/removecategory", jwtValidation, async (req, res) => {
+  const catId = req.body.catId;
+  console.log(req.body);
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+
+  if (payload.permission === "merchant") {
+    const preMerchant = await Merchant.findOne({ _id: payload._id });
+    preMerchant.category.pull(catId);
+
+    res.send(JSON.stringify(preMerchant));
+    return;
+  }
+  res.status(400).send("Can't add category");
+});
+
 module.exports = router;

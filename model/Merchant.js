@@ -51,7 +51,7 @@ const categorySchema = new mongoose.Schema({
   },
   foods: {
     type: [foodSchema],
-    required: true,
+    default: [],
   },
 });
 

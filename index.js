@@ -11,7 +11,7 @@ const apiUser = require("./api/user");
 const apiManager = require("./api/manager");
 const apiPartner = require("./api/partner");
 dotenv.config();
-app.use(express.urlencoded());
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 //Connect to DB
