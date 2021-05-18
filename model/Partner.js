@@ -1,5 +1,13 @@
 const mongoose = require("mongoose");
 
+const settingSchema = new mongoose.Schema({
+  radiusWorking: {
+    type: Number,
+    required: true,
+    default: 2000,
+  },
+});
+
 const identitySchema = new mongoose.Schema({
   number: {
     type: String,
@@ -33,7 +41,6 @@ const partnerSchema = new mongoose.Schema({
     maxlength: 30,
   },
   identity: {
-
     type: identitySchema,
     require: true,
   },
@@ -59,6 +66,10 @@ const partnerSchema = new mongoose.Schema({
   dateCreate: {
     type: String,
     default: Date.now,
+  },
+  setting: {
+    type: settingSchema,
+    require: true,
   },
 });
 

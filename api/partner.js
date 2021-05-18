@@ -6,7 +6,7 @@ const jwtValidation = require("../middleware/jwt.validate");
 const {
   registerPartnerValidation,
 } = require("../middleware/register.validate");
-const { loginValidation } = require("../middleware/auth.validate");
+const { loginValidationEmail } = require("../middleware/auth.validate");
 const md5 = require("md5");
 
 router.post("/register", jwtValidation, async (req, res) => {
@@ -25,18 +25,22 @@ router.post("/register", jwtValidation, async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  const { error } = loginValidation(req.body);
+  console.log("asdasdasd");
+  const { error } = loginValidationEmail(req.body);
   if (error) return res.status(400).send(error.details[0].message);
   try {
-    const merchant = await merchant.findOne({
-      ...req.body,
-      password: md5(req.body.password),
+    const partner = await Partner.findOne({
+      email: req.body.email,
     });
-    jwt.sign(
-      { _id: merchant._id, permission: "merchant" },
+    if (partner.password !== md5(req.body.password)) {
+      return res.status(400).send("Password is wrong!");
+    }
+    const token = jwt.sign(
+      { _id: partner._id, permission: "partner" },
       process.env.SECRET_KEY
     );
-    res.status(200).header({ auth_token: token }).send();
+    const id = partner._id;
+    res.status(200).header({ auth_token: token }).send({ token, id });
   } catch (err) {
     return res.send(err);
   }
@@ -80,6 +84,21 @@ router.get("/search", jwtValidation, async (req, res) => {
     } else res.send({});
   } catch (err) {
     res.status(400).send(err);
+  }
+});
+
+router.get("/profile", jwtValidation, async (req, res) => {
+  try {
+    const payload = jwt.verify(
+      req.header("auth_token"),
+      process.env.SECRET_KEY
+    );
+    const profile = await Partner.findOne({ _id: payload._id }).select([
+      "-password",
+    ]);
+    res.send(JSON.stringify(profile));
+  } catch (error) {
+    res.status(400).send("can't find Partner}");
   }
 });
 

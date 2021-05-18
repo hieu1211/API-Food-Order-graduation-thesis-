@@ -56,7 +56,7 @@ router.post("/login", async (req, res) => {
     { _id: user._id, permission: "user" },
     process.env.SECRET_KEY
   );
-  res.status(200).header({ auth_token: token }).send(token);
+  res.status(200).header({ auth_token: token }).send({ token, id: user._id });
 });
 router.post("/changeprofile", jwtValidation, async (req, res) => {
   const newData = req.body;
@@ -115,7 +115,7 @@ router.post("/auth", (req, res) => {
       req.header("auth_token"),
       process.env.SECRET_KEY
     );
-    if (!payload || payload.permission !== "manager")
+    if (!payload || payload.permission !== "user")
       res.status(400).send("Unauthorized!");
     else res.send("pass");
   } catch (error) {
