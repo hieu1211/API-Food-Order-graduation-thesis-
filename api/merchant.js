@@ -6,7 +6,7 @@ const jwtValidation = require("../middleware/jwt.validate");
 const {
   registerMerchantValidation,
 } = require("../middleware/register.validate");
-const { loginValidationMerchant } = require("../middleware/auth.validate");
+const { loginValidationEmail } = require("../middleware/auth.validate");
 const md5 = require("md5");
 
 router.post("/register", jwtValidation, async (req, res) => {
@@ -25,7 +25,7 @@ router.post("/register", jwtValidation, async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-  const { error } = loginValidationMerchant(req.body);
+  const { error } = loginValidationEmail(req.body);
   if (error) {
     return res.status(400).send(error.details[0].message);
   }

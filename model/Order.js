@@ -63,11 +63,29 @@ const orderSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ["processing", "complete", "cancel"],
+    enum: [
+      "new",
+      "finding",
+      "waitConfirm",
+      "picking",
+      "waitPick",
+      "delivering",
+      "complete",
+      "cancel",
+    ],
+    default: "new",
   },
   detail: {
     type: detailSchema,
     required: true,
+  },
+  note: {
+    type: String,
+    default: "",
+  },
+  distance: {
+    type: Number,
+    default: 0,
   },
   report: String,
 });
