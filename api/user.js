@@ -58,10 +58,6 @@ router.post("/login", async (req, res) => {
   );
   res.status(200).header({ auth_token: token }).send(token);
 });
-<<<<<<< HEAD
-
-=======
->>>>>>> c1fa349aacc5bdaae33df3ab4706da603a6fd415
 router.post("/changeprofile", jwtValidation, async (req, res) => {
   const newData = req.body;
   const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
@@ -138,10 +134,7 @@ router.get("/", async (req, res) => {
 
 router.get("/profile", jwtValidation, async (req, res) => {
   try {
-<<<<<<< HEAD
     console.log("asdasd");
-=======
->>>>>>> c1fa349aacc5bdaae33df3ab4706da603a6fd415
     const payload = jwt.verify(
       req.header("auth_token"),
       process.env.SECRET_KEY
