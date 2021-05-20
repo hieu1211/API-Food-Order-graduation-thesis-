@@ -288,4 +288,38 @@ router.post("/addressedit", jwtValidation, async (req, res) => {
   res.status(400).send("Can't update category");
 });
 
+router.post("/getopentime", jwtValidation, async (req, res) => {
+  console.log("hello");
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+  console.log(payload._id);
+  if (payload.permission === "merchant") {
+    let preMerchant = await Merchant.findOne({ _id: payload._id });
+    res.send(JSON.stringify(preMerchant.openTime));
+    return;
+  }
+  res.status(400).send("Can't get open time");
+});
+
+router.post("/updateopentime", jwtValidation, async (req, res) => {
+  const newOpenTime = req.body;
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+  console.log(payload._id);
+  if (payload.permission === "merchant") {
+    let preMerchant = await Merchant.findOneAndUpdate(
+      { _id: payload._id },
+      {
+        $set: {
+          openTime: newOpenTime,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    res.send(JSON.stringify(preMerchant.openTime));
+    return;
+  }
+  res.status(400).send("Can't get open time");
+});
+
 module.exports = router;

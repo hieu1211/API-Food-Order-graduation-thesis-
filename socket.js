@@ -69,6 +69,7 @@ const socket = function (server) {
           new: true,
         }
       );
+      console.log("finding partner");
       socket.broadcast.emit("newOrderFinding", order);
     });
 
@@ -166,6 +167,7 @@ const socket = function (server) {
         partner: orderUpdated.deliverId,
       });
     });
+    // partner end
 
     socket.on("storeClientInfo", ({ id, type }) => {
       var clientInfo = new Object();
@@ -174,12 +176,14 @@ const socket = function (server) {
       clientInfo.clientId = socket.id;
       clientInfo.socket = socket;
       clients.push(clientInfo);
-      const ods = orders.filter(
+      let ods = [];
+      ods = orders.filter(
         (order) =>
           order.merchantId._id == id ||
-          order.deliverId._id == id ||
+          (order.deliverId && order.deliverId._id == id) ||
           order.userOrderId._id == id
       );
+
       for (od in ods) {
         socket.join(od);
       }
