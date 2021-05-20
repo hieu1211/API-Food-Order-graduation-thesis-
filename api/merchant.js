@@ -289,7 +289,6 @@ router.post("/addressedit", jwtValidation, async (req, res) => {
 });
 
 router.post("/getopentime", jwtValidation, async (req, res) => {
-  console.log("hello");
   const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
   console.log(payload._id);
   if (payload.permission === "merchant") {
@@ -303,7 +302,6 @@ router.post("/getopentime", jwtValidation, async (req, res) => {
 router.post("/updateopentime", jwtValidation, async (req, res) => {
   const newOpenTime = req.body;
   const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
-  console.log(payload._id);
   if (payload.permission === "merchant") {
     let preMerchant = await Merchant.findOneAndUpdate(
       { _id: payload._id },
@@ -320,6 +318,38 @@ router.post("/updateopentime", jwtValidation, async (req, res) => {
     return;
   }
   res.status(400).send("Can't get open time");
+});
+
+router.post("/getstatus", jwtValidation, async (req, res) => {
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+  console.log(payload._id);
+  if (payload.permission === "merchant") {
+    let preMerchant = await Merchant.findOne({ _id: payload._id });
+    res.send(JSON.stringify(preMerchant.status));
+    return;
+  }
+  res.status(400).send("Can't get status");
+});
+
+router.post("/updatestatus", jwtValidation, async (req, res) => {
+  const newStatus = req.body.status;
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+  if (payload.permission === "merchant") {
+    let preMerchant = await Merchant.findOneAndUpdate(
+      { _id: payload._id },
+      {
+        $set: {
+          status: newStatus,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    res.send(JSON.stringify(preMerchant.status));
+    return;
+  }
+  res.status(400).send("Can't update status");
 });
 
 module.exports = router;
