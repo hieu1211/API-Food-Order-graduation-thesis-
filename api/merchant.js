@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
-const { Merchant, Category } = require("../model/Merchant");
+const { Merchant, Category, Food } = require("../model/Merchant");
 const jwtValidation = require("../middleware/jwt.validate");
 const {
   registerMerchantValidation,
@@ -169,17 +169,187 @@ router.post("/addcategory", jwtValidation, async (req, res) => {
 
 router.post("/removecategory", jwtValidation, async (req, res) => {
   const catId = req.body.catId;
-  console.log(req.body);
   const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
 
   if (payload.permission === "merchant") {
     const preMerchant = await Merchant.findOne({ _id: payload._id });
     preMerchant.category.pull(catId);
+    await preMerchant.save();
 
     res.send(JSON.stringify(preMerchant));
     return;
   }
   res.status(400).send("Can't add category");
+});
+
+router.post("/foodadd", jwtValidation, async (req, res) => {
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+
+  if (payload.permission === "merchant") {
+    const preMerchant = await Merchant.findOne({ _id: payload._id });
+    const catId = req.body.catId;
+    const newFood = new Food({
+      name: req.body.name,
+      price: req.body.price,
+      img: "",
+      status: true,
+    });
+
+    preMerchant.category.map((cat, index) => {
+      if (String(cat._id) === catId) {
+        cat.foods.push(newFood);
+      }
+      console.log(typeof cat._id, typeof catId);
+      return cat;
+    });
+
+    await preMerchant.save();
+
+    res.send(JSON.stringify(preMerchant));
+    return;
+  }
+  res.status(400).send("Can't add food");
+});
+
+router.post("/foodremove", jwtValidation, async (req, res) => {
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+
+  console.log(req.body);
+
+  if (payload.permission === "merchant") {
+    const preMerchant = await Merchant.findOne({ _id: payload._id });
+    const indexOfCat = preMerchant.category.findIndex(
+      (e) => String(e._id) === req.body.catId
+    );
+
+    preMerchant.category[indexOfCat].foods.pull(req.body.foodId);
+    preMerchant.save();
+    res.send(JSON.stringify(preMerchant));
+    return;
+  }
+  res.status(400).send("Can't remove food");
+});
+
+router.post("/foodedit", jwtValidation, async (req, res) => {
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+  console.log(req.body);
+  const newFood = {
+    _id: req.body._id,
+    name: req.body.name,
+    price: parseInt(req.body.price),
+    img: "",
+    status: req.body.status,
+  };
+
+  if (payload.permission === "merchant") {
+    const preMerchant = await Merchant.findOne({ _id: payload._id });
+
+    const indexOfCatCurrent = preMerchant.category.findIndex(
+      (e) => String(e._id) === req.body.catIdCurrent
+    );
+    const indexOfCatNew = preMerchant.category.findIndex(
+      (e) => String(e._id) === req.body.catIdNew
+    );
+    if (indexOfCatCurrent === indexOfCatNew) {
+      preMerchant.category[indexOfCatCurrent].foods.pull(req.body._id);
+      preMerchant.category[indexOfCatCurrent].foods.push(newFood);
+      preMerchant.save();
+    } else {
+      preMerchant.category[indexOfCatCurrent].foods.pull(req.body._id);
+      preMerchant.category[indexOfCatNew].foods.push(newFood);
+      preMerchant.save();
+    }
+
+    res.send(JSON.stringify(preMerchant));
+    return;
+  }
+  res.status(400).send("Can't edit food");
+});
+
+router.post("/addressedit", jwtValidation, async (req, res) => {
+  const newData = req.body;
+  console.log(newData);
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+  if (payload.permission === "merchant") {
+    let merchant = await Merchant.findOneAndUpdate(
+      { _id: payload._id },
+      {
+        $set: {
+          location: newData,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    res.send(JSON.stringify(merchant));
+    return;
+  }
+  res.status(400).send("Can't update category");
+});
+
+router.post("/getopentime", jwtValidation, async (req, res) => {
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+  console.log(payload._id);
+  if (payload.permission === "merchant") {
+    let preMerchant = await Merchant.findOne({ _id: payload._id });
+    res.send(JSON.stringify(preMerchant.openTime));
+    return;
+  }
+  res.status(400).send("Can't get open time");
+});
+
+router.post("/updateopentime", jwtValidation, async (req, res) => {
+  const newOpenTime = req.body;
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+  if (payload.permission === "merchant") {
+    let preMerchant = await Merchant.findOneAndUpdate(
+      { _id: payload._id },
+      {
+        $set: {
+          openTime: newOpenTime,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    res.send(JSON.stringify(preMerchant.openTime));
+    return;
+  }
+  res.status(400).send("Can't get open time");
+});
+
+router.post("/getstatus", jwtValidation, async (req, res) => {
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+  console.log(payload._id);
+  if (payload.permission === "merchant") {
+    let preMerchant = await Merchant.findOne({ _id: payload._id });
+    res.send(JSON.stringify(preMerchant.status));
+    return;
+  }
+  res.status(400).send("Can't get status");
+});
+
+router.post("/updatestatus", jwtValidation, async (req, res) => {
+  const newStatus = req.body.status;
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+  if (payload.permission === "merchant") {
+    let preMerchant = await Merchant.findOneAndUpdate(
+      { _id: payload._id },
+      {
+        $set: {
+          status: newStatus,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    res.send(JSON.stringify(preMerchant.status));
+    return;
+  }
+  res.status(400).send("Can't update status");
 });
 
 module.exports = router;

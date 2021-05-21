@@ -35,10 +35,10 @@ const foodSchema = new mongoose.Schema({
   },
   img: {
     type: String,
+    default: "",
   },
   status: {
     type: Boolean,
-    required: true,
     default: true,
   },
 });
@@ -228,4 +228,5 @@ const merchantSchema = new mongoose.Schema({
 module.exports = {
   Category: mongoose.model("Category", categorySchema),
   Merchant: mongoose.model("Merchant", merchantSchema),
+  Food: mongoose.model("Food", foodSchema),
 };
