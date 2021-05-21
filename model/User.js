@@ -1,8 +1,4 @@
 const mongoose = require("mongoose");
-<<<<<<< HEAD
-
-=======
->>>>>>> c1fa349aacc5bdaae33df3ab4706da603a6fd415
 mongoose.set("useFindAndModify", false);
 
 const locationSchema = new mongoose.Schema({
