@@ -36,4 +36,46 @@ router.get("/getbystatus", jwtValidation, async (req, res) => {
   }
 });
 
+router.get("/getbypartner", jwtValidation, async (req, res) => {
+  try {
+    const payload = jwt.verify(
+      req.header("auth_token"),
+      process.env.SECRET_KEY
+    );
+    const partnerId = req.query.id;
+    if (
+      payload.permission === "manager" ||
+      (payload.permission === "partner" && payload._id == partnerId)
+    ) {
+      const orders = await Order.find({
+        deliverId: partnerId,
+      })
+        .populate("userOrderId")
+        .populate("merchantId")
+        .populate("deliverId");
+      res.send(orders);
+    }
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+router.get("/getchatdata", jwtValidation, async (req, res) => {
+  try {
+    const payload = jwt.verify(
+      req.header("auth_token"),
+      process.env.SECRET_KEY
+    );
+    const orderId = req.query.id;
+    if (payload.permission === "manager" || payload.permission === "partner") {
+      const order = await Order.findOne({
+        _id: orderId,
+      });
+      res.send(order.chat);
+    }
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
 module.exports = router;

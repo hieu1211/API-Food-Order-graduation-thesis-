@@ -38,6 +38,19 @@ const detailSchema = new mongoose.Schema({
   },
 });
 
+const chatMessageSchema = new mongoose.Schema({
+  //0 partner, 1 user
+  type: {
+    type: Number,
+    enum: [0, 1],
+    required: true,
+  },
+  content: {
+    type: String,
+    required: true,
+  },
+});
+
 const orderSchema = new mongoose.Schema({
   userOrderId: {
     type: mongoose.ObjectId,
@@ -48,6 +61,19 @@ const orderSchema = new mongoose.Schema({
     type: String,
     default: Date.now,
   },
+  timePartnerReceive: {
+    type: String,
+    default: null,
+  },
+  timePartnerGetFood: {
+    type: String,
+    default: null,
+  },
+  timeDeliverDone: {
+    type: String,
+    default: null,
+  },
+
   timeFinish: {
     type: String,
     default: null,
@@ -87,6 +113,9 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
-  report: String,
+  chat: {
+    type: [chatMessageSchema],
+    default: [],
+  },
 });
 module.exports = mongoose.model("Order", orderSchema);

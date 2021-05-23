@@ -25,14 +25,12 @@ const socket = function (server) {
       const type = socket.handshake.query.type;
 
       if (id != "undefined") {
-        console.log("storeClientInfo");
         var clientInfo = new Object();
         clientInfo.customId = id;
         clientInfo.type = type;
         clientInfo.clientId = socket.id;
         clientInfo.socket = socket;
         clients.push(clientInfo);
-        console.log(orders);
         const ods = orders.filter((order) => {
           const deliver = order.deliverId;
           if (deliver) {
@@ -44,9 +42,7 @@ const socket = function (server) {
           }
           return order.merchantId._id == id || order.userOrderId._id == id;
         });
-        console.log(ods);
         for (od of ods) {
-          console.log(clientInfo.type, od._id);
           socket.join(String(od._id));
         }
       }
@@ -74,12 +70,11 @@ const socket = function (server) {
               new: true,
             }
           );
-          console.log("newOrderFinding");
           socket.broadcast.emit("newOrderFinding", order);
         }
       });
 
-      socket.on("approveOrder", async (order_id) => {
+      socket.on("approveOrder", async ({ order_id, timePartnerGetFood }) => {
         const client = clients.find((client) => client.clientId == socket.id);
         const order = orders.find((order) => {
           return String(order._id) === order_id;
@@ -91,6 +86,7 @@ const socket = function (server) {
             {
               $set: {
                 status: "picking",
+                timePartnerGetFood: timePartnerGetFood,
               },
             },
             {
@@ -127,7 +123,6 @@ const socket = function (server) {
 
       socket.on("haveOrderProcessing", (id) => {
         const orderProcessing = orders.find((ord) => ord.userOrderId._id == id);
-        console.log(orders, id);
         socket.emit("canOrder", orderProcessing);
       });
 
@@ -156,7 +151,6 @@ const socket = function (server) {
         const order = orders.find((order) => {
           return String(order._id) === order_id;
         });
-        console.log(order.status);
         if (client.type == "partner" && order.status == "finding") {
           order.status = "waitConfirm";
           const orderUpdated = await Order.findOneAndUpdate(
@@ -165,6 +159,14 @@ const socket = function (server) {
               $set: {
                 deliverId: client.customId,
                 status: order.status,
+                timePartnerReceive: Date.now(),
+                chat: [
+                  {
+                    type: 0,
+                    content:
+                      "Mình đã nhận đơn và sẽ giao cho bạn sớm nhất có thể, hãy an tâm ở nhà và đợi mình nhé!",
+                  },
+                ],
               },
             },
             {
@@ -183,6 +185,15 @@ const socket = function (server) {
         }
       });
 
+      socket.on("orderDelivering", (partner_id) => {
+        const orderDelivering = orders.find((order) => {
+          if (order.deliverId)
+            return String(order.deliverId._id) === String(partner_id);
+          return false;
+        });
+        socket.emit("orderDelivering", orderDelivering);
+      });
+
       socket.on("storeClientInfo", ({ id, type }) => {
         var clientInfo = new Object();
         clientInfo.customId = id;
@@ -196,9 +207,33 @@ const socket = function (server) {
             (order.deliverId && order.deliverId._id == id) ||
             order.userOrderId._id == id
         );
-        for (od in ods) {
+
+        for (od of ods) {
           socket.join(String(od._id));
+          console.log(od);
         }
+      });
+
+      //all: Chat
+      socket.on("chatAction", async (data) => {
+        const order = orders.find((order) => {
+          return String(order._id) === data.order_id;
+        });
+        console.log(data);
+        const newMessage = { type: data.type, content: data.message };
+        order.chat.push(newMessage);
+        await Order.findOneAndUpdate(
+          { _id: data.order_id },
+          {
+            $set: {
+              chat: order.chat,
+            },
+          },
+          {
+            new: true,
+          }
+        );
+        io.in(String(data.order_id)).emit("chatAction", newMessage);
       });
 
       socket.on("disconnect", function (data) {

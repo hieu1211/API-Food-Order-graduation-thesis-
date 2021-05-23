@@ -46,6 +46,20 @@ router.post("/login", async (req, res) => {
   }
 });
 
+router.post("/auth", (req, res) => {
+  try {
+    const payload = jwt.verify(
+      req.header("auth_token"),
+      process.env.SECRET_KEY
+    );
+    if (!payload || payload.permission !== "partner")
+      res.status(400).send("Unauthorized!");
+    else res.send("pass");
+  } catch (error) {
+    res.status(400).send("Unauthorized!");
+  }
+});
+
 router.get("/", jwtValidation, async (req, res) => {
   try {
     if (req.permission === "manager") {
