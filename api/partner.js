@@ -42,7 +42,7 @@ router.post("/login", async (req, res) => {
     const id = partner._id;
     res.status(200).header({ auth_token: token }).send({ token, id });
   } catch (err) {
-    return res.send(err);
+    return res.status(400).send(err);
   }
 });
 
