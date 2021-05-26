@@ -36,6 +36,28 @@ router.get("/getbystatus", jwtValidation, async (req, res) => {
   }
 });
 
+router.get("/getfindingpartner", jwtValidation, async (req, res) => {
+  try {
+    const payload = jwt.verify(
+      req.header("auth_token"),
+      process.env.SECRET_KEY
+    );
+
+    if (payload.permission === "partner") {
+      const orders = await Order.find({
+        status: { $nin: ["new", "delivering", "complete", "cancel"] },
+        deliverId: null,
+      })
+        .populate("userOrderId")
+        .populate("merchantId")
+        .populate("deliverId");
+      res.send(orders);
+    }
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
 router.get("/getbypartner", jwtValidation, async (req, res) => {
   try {
     const payload = jwt.verify(
@@ -49,6 +71,27 @@ router.get("/getbypartner", jwtValidation, async (req, res) => {
     ) {
       const orders = await Order.find({
         deliverId: partnerId,
+      })
+        .populate("userOrderId")
+        .populate("merchantId")
+        .populate("deliverId");
+      res.send(orders);
+    }
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
+router.get("/getallmyorder", jwtValidation, async (req, res) => {
+  try {
+    const payload = jwt.verify(
+      req.header("auth_token"),
+      process.env.SECRET_KEY
+    );
+
+    if (payload.permission === "user") {
+      const orders = await Order.find({
+        userOrderId: payload._id,
       })
         .populate("userOrderId")
         .populate("merchantId")

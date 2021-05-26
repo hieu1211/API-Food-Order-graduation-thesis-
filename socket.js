@@ -1,4 +1,5 @@
 const Order = require("./model/Order");
+const Partner = require("./model/Partner");
 const User = require("./model/User");
 
 var orders = [];
@@ -93,7 +94,10 @@ const socket = function (server) {
               new: true,
             }
           );
-          io.in(order_id).emit("approveOrder", order_id);
+          io.in(order_id).emit("changeStatus", {
+            orderId: order_id,
+            status: "picking",
+          });
         }
       });
 
@@ -102,7 +106,9 @@ const socket = function (server) {
         const order = orders.find((order) => {
           return String(order._id) === order_id;
         });
+        console.log(clients, socket.id);
         if (order.merchantId._id == client.customId) {
+          console.log("ok");
           order.status = "waitPick";
           await Order.findOneAndUpdate(
             { _id: order_id },
@@ -115,7 +121,10 @@ const socket = function (server) {
               new: true,
             }
           );
-          io.in(order_id).emit("prepareDone", order_id);
+          io.in(order_id).emit("changeStatus", {
+            orderId: order_id,
+            status: "waitPick",
+          });
         }
       });
 
@@ -151,8 +160,8 @@ const socket = function (server) {
         const order = orders.find((order) => {
           return String(order._id) === order_id;
         });
-        if (client.type == "partner" && order.status == "finding") {
-          order.status = "waitConfirm";
+        if (client.type == "partner") {
+          if (order.status == "finding") order.status = "waitConfirm";
           const orderUpdated = await Order.findOneAndUpdate(
             { _id: order_id },
             {
@@ -177,6 +186,7 @@ const socket = function (server) {
             .populate("merchantId")
             .populate("deliverId");
           order.deliverId = orderUpdated.deliverId;
+          order.chat = orderUpdated.chat;
           socket.join(String(orderUpdated._id));
           io.in(String(orderUpdated._id)).emit("findDonePartner", {
             orderId: order_id,
@@ -185,13 +195,113 @@ const socket = function (server) {
         }
       });
 
+      socket.on("DeliveringOrder", async (order_id) => {
+        const client = clients.find((client) => client.clientId == socket.id);
+        const order = orders.find((order) => {
+          return String(order._id) === order_id;
+        });
+        if (client.type == "partner") {
+          order.status = "delivering";
+          await Order.findOneAndUpdate(
+            { _id: order_id },
+            {
+              $set: {
+                status: order.status,
+              },
+            },
+            {
+              new: true,
+            }
+          );
+          io.in(order_id).emit("DeliveringOrder", order_id);
+        }
+      });
+
+      socket.on("cancelOrder", async (order_id) => {
+        const client = clients.find((client) => client.clientId == socket.id);
+        const order = orders.find((order) => {
+          return String(order._id) === order_id;
+        });
+        if (
+          client.customId == order.deliverId._id &&
+          (order.status === "waitConfirm" ||
+            order.status === "waitPick" ||
+            order.status === "picking")
+        ) {
+          order.deliverId = null;
+          await Order.findOneAndUpdate(
+            { _id: order_id },
+            {
+              $set: {
+                deliverId: null,
+              },
+            },
+            {
+              new: true,
+            }
+          );
+          await Partner.findOneAndUpdate(
+            { _id: client.customId },
+            {
+              $push: {
+                cancelOrder: { _id: order_id },
+              },
+            },
+            {
+              new: true,
+            }
+          );
+          socket.leave(order_id);
+          io.in(order_id).emit("partnerCancelOrder", order_id);
+        }
+      });
+
+      socket.on("completeOrder", async (order_id) => {
+        const client = clients.find((client) => client.clientId == socket.id);
+        const idx = orders.findIndex((order) => {
+          return String(order._id) === order_id;
+        });
+        if (idx > -1) {
+          orders.splice(idx, 1);
+        }
+        if (client.type == "partner") {
+          await Order.findOneAndUpdate(
+            { _id: order_id },
+            {
+              $set: {
+                status: "complete",
+                timeFinish: Date.now(),
+              },
+            },
+            {
+              new: true,
+            }
+          );
+          io.in(order_id).emit("changeStatus", {
+            orderId: order_id,
+            status: "complete",
+          });
+        }
+      });
+
       socket.on("orderDelivering", (partner_id) => {
         const orderDelivering = orders.find((order) => {
-          if (order.deliverId)
+          if (order.deliverId && !["complete", "cancel"].includes(order.status))
             return String(order.deliverId._id) === String(partner_id);
           return false;
         });
         socket.emit("orderDelivering", orderDelivering);
+      });
+
+      socket.on("sendGeo", (geo) => {
+        const client = clients.find((client) => client.clientId == socket.id);
+        const orderDelivering = orders.find((order) => {
+          if (order.deliverId && !["complete", "cancel"].includes(order.status))
+            return String(order.deliverId._id) === String(client.customId);
+          return false;
+        });
+        if (orderDelivering)
+          io.in(String(orderDelivering._id)).emit("sendGeo", geo);
       });
 
       socket.on("storeClientInfo", ({ id, type }) => {
