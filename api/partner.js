@@ -137,4 +137,78 @@ router.get("/:id", jwtValidation, async (req, res) => {
   }
 });
 
+router.post("/updatesetting", jwtValidation, async (req, res) => {
+  const newSetting = req.body;
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+  if (payload.permission === "partner") {
+    let parter = await Partner.findByIdAndUpdate(
+      {
+        _id: payload._id,
+      },
+      {
+        $set: {
+          setting: newSetting,
+        },
+      },
+      { new: true }
+    );
+    res.send(JSON.stringify(parter));
+    return;
+  }
+  res.status(400).send("Can't update setting");
+});
+
+router.post("/changeinfo", jwtValidation, async (req, res) => {
+  const newData = req.body;
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+  if (payload.permission === "partner") {
+    let prePartner = await Partner.findOne({ _id: payload._id });
+    let parter = await Partner.findByIdAndUpdate(
+      {
+        _id: payload._id,
+      },
+      {
+        $set: {
+          ...prePartner._doc,
+          ...newData,
+        },
+      },
+      { new: true }
+    );
+    res.send(JSON.stringify(parter));
+    return;
+  }
+  res.status(400).send("Can't update indivual infomation");
+});
+
+router.post("/changepass", jwtValidation, async (req, res) => {
+  const dataPass = req.body;
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+  if (payload.permission === "partner") {
+    let parter = await Partner.findOne({ _id: payload._id });
+    if (parter.password === md5(dataPass.newPass)) {
+      res.send("fail1");
+      return;
+    } else if (parter.password !== md5(dataPass.oldPass)) {
+      res.send("fail2");
+      return;
+    } else {
+      let parter = await Partner.findByIdAndUpdate(
+        {
+          _id: payload._id,
+        },
+        {
+          $set: {
+            password: md5(dataPass.newPass),
+          },
+        },
+        { new: true }
+      );
+      res.send("Success");
+      return;
+    }
+  }
+  res.status(400).send("Can't change password");
+});
+
 module.exports = router;

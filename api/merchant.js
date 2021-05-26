@@ -191,7 +191,7 @@ router.post("/foodadd", jwtValidation, async (req, res) => {
     const newFood = new Food({
       name: req.body.name,
       price: req.body.price,
-      img: "",
+      img: req.body.foodImg,
       status: true,
     });
 
