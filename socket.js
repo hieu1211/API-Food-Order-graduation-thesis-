@@ -1,4 +1,5 @@
 const Order = require("./model/Order");
+const Partner = require("./model/Partner");
 const User = require("./model/User");
 
 var orders = [];
@@ -216,6 +217,45 @@ const socket = function (server) {
         }
       });
 
+      socket.on("cancelOrder", async (order_id) => {
+        const client = clients.find((client) => client.clientId == socket.id);
+        const order = orders.find((order) => {
+          return String(order._id) === order_id;
+        });
+        if (
+          client.customId == order.deliverId._id &&
+          (order.status === "waitConfirm" ||
+            order.status === "waitPick" ||
+            order.status === "picking")
+        ) {
+          order.deliverId = null;
+          await Order.findOneAndUpdate(
+            { _id: order_id },
+            {
+              $set: {
+                deliverId: null,
+              },
+            },
+            {
+              new: true,
+            }
+          );
+          await Partner.findOneAndUpdate(
+            { _id: client.customId },
+            {
+              $push: {
+                cancelOrder: { _id: order_id },
+              },
+            },
+            {
+              new: true,
+            }
+          );
+          socket.leave(order_id);
+          io.in(order_id).emit("partnerCancelOrder", order_id);
+        }
+      });
+
       socket.on("completeOrder", async (order_id) => {
         const client = clients.find((client) => client.clientId == socket.id);
         const idx = orders.findIndex((order) => {
@@ -251,6 +291,17 @@ const socket = function (server) {
           return false;
         });
         socket.emit("orderDelivering", orderDelivering);
+      });
+
+      socket.on("sendGeo", (geo) => {
+        const client = clients.find((client) => client.clientId == socket.id);
+        const orderDelivering = orders.find((order) => {
+          if (order.deliverId && !["complete", "cancel"].includes(order.status))
+            return String(order.deliverId._id) === String(client.customId);
+          return false;
+        });
+        if (orderDelivering)
+          io.in(String(orderDelivering._id)).emit("sendGeo", geo);
       });
 
       socket.on("storeClientInfo", ({ id, type }) => {

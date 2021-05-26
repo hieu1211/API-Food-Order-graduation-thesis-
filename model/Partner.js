@@ -71,6 +71,10 @@ const partnerSchema = new mongoose.Schema({
     type: settingSchema,
     require: true,
   },
+  cancelOrder: {
+    type: [mongoose.ObjectId],
+    ref: "Order",
+  },
 });
 
 const infoSchema = new mongoose.Schema({});

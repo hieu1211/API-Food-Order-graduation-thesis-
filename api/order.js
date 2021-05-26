@@ -82,6 +82,27 @@ router.get("/getbypartner", jwtValidation, async (req, res) => {
   }
 });
 
+router.get("/getallmyorder", jwtValidation, async (req, res) => {
+  try {
+    const payload = jwt.verify(
+      req.header("auth_token"),
+      process.env.SECRET_KEY
+    );
+
+    if (payload.permission === "user") {
+      const orders = await Order.find({
+        userOrderId: payload._id,
+      })
+        .populate("userOrderId")
+        .populate("merchantId")
+        .populate("deliverId");
+      res.send(orders);
+    }
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
 router.get("/getchatdata", jwtValidation, async (req, res) => {
   try {
     const payload = jwt.verify(
