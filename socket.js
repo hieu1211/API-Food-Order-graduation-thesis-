@@ -106,7 +106,6 @@ const socket = function (server) {
         const order = orders.find((order) => {
           return String(order._id) === order_id;
         });
-        console.log(clients, socket.id);
         if (order.merchantId._id == client.customId) {
           console.log("ok");
           order.status = "waitPick";
@@ -128,6 +127,31 @@ const socket = function (server) {
         }
       });
 
+      socket.on("merchantCancelOrder", async (data) => {
+        const client = clients.find((client) => client.clientId == socket.id);
+        const idx = orders.findIndex((order) => {
+          return String(order._id) === data.order_id;
+        });
+        if (idx > -1) {
+          orders.splice(idx, 1);
+        }
+        console.log(data.reasons);
+        await Order.findOneAndUpdate(
+          { _id: data.order_id },
+          {
+            $set: {
+              status: "cancel",
+              timeDeliverDone: 0,
+              reasonCancel: data.reasons,
+            },
+          },
+          {
+            new: true,
+          }
+        );
+        io.in(String(data.order_id)).emit("merchantCancelOrder", order_id);
+      });
+
       //users
 
       socket.on("haveOrderProcessing", (id) => {
@@ -146,12 +170,67 @@ const socket = function (server) {
           .populate("userOrderId")
           .populate("merchantId");
         orders.push(orderSaved);
-        socket.join(String(orderSaved._id));
+        let order_id = String(orderSaved._id);
+        socket.join(order_id);
         const merchant = clients.find((client) => {
           return client.customId === String(orderSaved.merchantId._id);
         });
-        if (merchant) merchant.socket.join(String(orderSaved._id));
-        io.in(String(orderSaved._id)).emit("newOrder", orderSaved);
+        if (merchant) merchant.socket.join(order_id);
+        io.in(order_id).emit("newOrder", orderSaved);
+
+        setTimeout(async () => {
+          console.log("startRemove", order_id);
+          const order = orders.find((order) => {
+            return String(order._id) === order_id;
+          });
+          const idx = orders.findIndex((order) => {
+            return String(order._id) === order_id;
+          });
+          if (idx > -1) {
+            if (order.status !== "complete" || order.status !== "cancel") {
+              await Order.findOneAndUpdate(
+                { _id: order_id },
+                {
+                  $set: {
+                    status: "cancel",
+                    timeDeliverDone: 0,
+                  },
+                },
+                {
+                  new: true,
+                }
+              );
+            }
+            orders.splice(idx, 1);
+          }
+          // io.sockets.adapter.rooms[order_id].forEach(function (s) {
+          //   s.leave(order_id);
+          // });
+        }, 8000000);
+      });
+
+      socket.on("userCancelOrder", async (order_id) => {
+        console.log("call");
+        const client = clients.find((client) => client.clientId == socket.id);
+        const idx = orders.findIndex((order) => {
+          return String(order._id) === order_id;
+        });
+        if (idx > -1) {
+          orders.splice(idx, 1);
+        }
+        await Order.findOneAndUpdate(
+          { _id: order_id },
+          {
+            $set: {
+              status: "cancel",
+              timeDeliverDone: 0,
+            },
+          },
+          {
+            new: true,
+          }
+        );
+        io.in(String(order_id)).emit("userCancelOrder", order_id);
       });
 
       //partners
@@ -270,7 +349,7 @@ const socket = function (server) {
             {
               $set: {
                 status: "complete",
-                timeFinish: Date.now(),
+                timeDeliverDone: Date.now(),
               },
             },
             {

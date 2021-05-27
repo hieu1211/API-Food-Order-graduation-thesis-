@@ -73,11 +73,6 @@ const orderSchema = new mongoose.Schema({
     type: String,
     default: null,
   },
-
-  timeFinish: {
-    type: String,
-    default: null,
-  },
   deliverId: {
     type: mongoose.ObjectId,
     ref: "Partner",
@@ -115,6 +110,10 @@ const orderSchema = new mongoose.Schema({
   },
   chat: {
     type: [chatMessageSchema],
+    default: [],
+  },
+  reasonCancel: {
+    type: [String],
     default: [],
   },
 });
