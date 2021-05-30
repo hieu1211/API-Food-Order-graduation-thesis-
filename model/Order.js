@@ -19,6 +19,22 @@ const foodSchema = new mongoose.Schema({
   },
 });
 
+const locationSchema = new mongoose.Schema({
+  address: {
+    type: String,
+    maxlength: 150,
+    default: "",
+  },
+  lat: {
+    type: String,
+    default: "",
+  },
+  lng: {
+    type: String,
+    default: "",
+  },
+});
+
 const detailSchema = new mongoose.Schema({
   foods: {
     type: [foodSchema],
@@ -34,6 +50,10 @@ const detailSchema = new mongoose.Schema({
   },
   total: {
     type: Number,
+    required: true,
+  },
+  location: {
+    type: locationSchema,
     required: true,
   },
 });
@@ -115,6 +135,10 @@ const orderSchema = new mongoose.Schema({
   reasonCancel: {
     type: [String],
     default: [],
+  },
+  rateDeliver: {
+    type: Number,
+    default: null,
   },
 });
 module.exports = mongoose.model("Order", orderSchema);
