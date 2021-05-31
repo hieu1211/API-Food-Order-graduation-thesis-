@@ -241,6 +241,7 @@ const socket = function (server) {
 
       //partners
       socket.on("chooseOrder", async (order_id) => {
+        console.log("asdasdasdasd");
         const client = clients.find((client) => client.clientId == socket.id);
         const order = orders.find((order) => {
           return String(order._id) === order_id;
@@ -273,7 +274,7 @@ const socket = function (server) {
           order.deliverId = orderUpdated.deliverId;
           order.chat = orderUpdated.chat;
           socket.join(String(orderUpdated._id));
-          io.in(String(orderUpdated._id)).emit("findDonePartner", {
+          io.in(String(order_id)).emit("findDonePartner", {
             orderId: order_id,
             partner: orderUpdated.deliverId,
           });
@@ -351,6 +352,9 @@ const socket = function (server) {
           order: order,
           orderId: order_id,
           status: "complete",
+        });
+        io.in(order_id).emit("completeOrder", {
+          orderId: order_id,
         });
         const idx = orders.findIndex((order) => {
           return String(order._id) === order_id;
