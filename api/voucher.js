@@ -3,6 +3,7 @@ const router = express.Router();
 const jwtValidation = require("../middleware/jwt.validate");
 const Voucher = require("../model/Voucher");
 const jwt = require("jsonwebtoken");
+const Order = require("../model/Order");
 
 //Manager
 router.get("/", jwtValidation, async (req, res) => {
@@ -50,6 +51,23 @@ router.post("/modify", jwtValidation, async (req, res) => {
       );
       res.send(modified);
     } else res.status(400).send("Unauthorized!");
+  } catch (error) {
+    res.status(400).send(error);
+  }
+});
+
+router.post("/check", jwtValidation, async (req, res) => {
+  try {
+    const modified = await Voucher.findOne({ code: req.body.code });
+    const order = await Order.findOne({
+      userOrderId: req._id,
+      code: req.body.code,
+    });
+    if (modified && !order)
+      if (modified.retained > 0) return res.send(modified);
+      else return res.status(201).send();
+    else if (modified && order) res.status(202).send();
+    return res.status(400).send();
   } catch (error) {
     res.status(400).send(error);
   }

@@ -43,6 +43,10 @@ const voucherSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
+  banner: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 module.exports = mongoose.model("Voucher", voucherSchema);

@@ -140,5 +140,8 @@ const orderSchema = new mongoose.Schema({
     type: Number,
     default: null,
   },
+  code: {
+    type: String,
+  },
 });
 module.exports = mongoose.model("Order", orderSchema);
