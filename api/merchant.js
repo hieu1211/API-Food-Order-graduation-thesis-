@@ -49,15 +49,16 @@ router.post("/login", async (req, res) => {
 });
 
 //check Authen after login
-router.post("/auth", (req, res) => {
+router.post("/auth", jwtValidation, (req, res) => {
+  console.log(req.header("auth_token"));
   try {
     const payload = jwt.verify(
       req.header("auth_token"),
       process.env.SECRET_KEY
     );
-    if (!payload || payload.permission !== "merchant")
+    if (payload.permission !== "merchant")
       res.status(400).send("Unauthorized!");
-    else res.send("pass");
+    else res.status(200).send("pass");
   } catch (error) {
     res.status(400).send("Unauthorized!");
   }

@@ -121,4 +121,25 @@ router.get("/getchatdata", jwtValidation, async (req, res) => {
   }
 });
 
+router.get("/getbyid", jwtValidation, async (req, res) => {
+  try {
+    const payload = jwt.verify(
+      req.header("auth_token"),
+      process.env.SECRET_KEY
+    );
+    const orderId = req.query.id;
+    if (payload.permission === "manager") {
+      const order = await Order.findOne({
+        _id: orderId,
+      })
+        .populate("userOrderId")
+        .populate("merchantId")
+        .populate("deliverId");
+      res.send(order);
+    }
+  } catch (err) {
+    res.status(400).send(err);
+  }
+});
+
 module.exports = router;
