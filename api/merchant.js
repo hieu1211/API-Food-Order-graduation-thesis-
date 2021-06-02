@@ -237,7 +237,7 @@ router.post("/foodedit", jwtValidation, async (req, res) => {
     _id: req.body._id,
     name: req.body.name,
     price: parseInt(req.body.price),
-    img: "",
+    img: req.body.img,
     status: req.body.status,
   };
 
@@ -252,11 +252,11 @@ router.post("/foodedit", jwtValidation, async (req, res) => {
     );
     if (indexOfCatCurrent === indexOfCatNew) {
       preMerchant.category[indexOfCatCurrent].foods.pull(req.body._id);
-      preMerchant.category[indexOfCatCurrent].foods.push(newFood);
+      preMerchant.category[indexOfCatCurrent].foods.unshift(newFood);
       preMerchant.save();
     } else {
       preMerchant.category[indexOfCatCurrent].foods.pull(req.body._id);
-      preMerchant.category[indexOfCatNew].foods.push(newFood);
+      preMerchant.category[indexOfCatNew].foods.unshift(newFood);
       preMerchant.save();
     }
 

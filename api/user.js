@@ -161,4 +161,30 @@ router.get("/:id", jwtValidation, async (req, res) => {
     res.status(400).send(err);
   }
 });
+
+router.post("/changeavt", jwtValidation, async (req, res) => {
+  const newData = req.body;
+  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
+  if (payload.permission === "user") {
+    try {
+      let savedUser = await User.findOneAndUpdate(
+        { _id: payload._id },
+        {
+          $set: {
+            "info.avt": newData.avt,
+          },
+        },
+        {
+          new: true,
+        }
+      );
+      res.send(JSON.stringify(savedUser));
+      return;
+    } catch {
+      res.status(400).send("Can't update avatar");
+    }
+  }
+  res.status(400).send("Can't update avatar");
+});
+
 module.exports = router;
