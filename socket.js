@@ -321,16 +321,8 @@ const socket = function (server) {
               $set: {
                 deliverId: null,
               },
-            },
-            {
-              new: true,
-            }
-          );
-          await Partner.findOneAndUpdate(
-            { _id: client.customId },
-            {
               $push: {
-                cancelOrder: { _id: order_id },
+                cancelPartner: client.customId,
               },
             },
             {

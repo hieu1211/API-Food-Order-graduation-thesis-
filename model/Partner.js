@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const md5 = require("md5");
 
 const settingSchema = new mongoose.Schema({
   radiusWorking: {
@@ -27,6 +28,19 @@ const partnerSchema = new mongoose.Schema({
   email: {
     type: String,
     unique: true,
+    validate: {
+      validator: async function (email) {
+        const user = await this.constructor.findOne({ email });
+        if (user) {
+          if (this.id === user.id) {
+            return true;
+          }
+          return false;
+        }
+        return true;
+      },
+      message: (props) => "The specified email address is already in use.",
+    },
     minlength: 6,
     maxlength: 30,
     required: true,
@@ -34,6 +48,7 @@ const partnerSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true,
+    default: md5("123"),
   },
   name: {
     type: String,
@@ -70,10 +85,6 @@ const partnerSchema = new mongoose.Schema({
   setting: {
     type: settingSchema,
     require: true,
-  },
-  cancelOrder: {
-    type: [mongoose.ObjectId],
-    ref: "Order",
   },
 });
 
