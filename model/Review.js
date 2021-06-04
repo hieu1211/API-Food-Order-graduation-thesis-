@@ -35,16 +35,20 @@ const reviewSchema = new mongoose.Schema({
   },
   orderId: {
     type: mongoose.ObjectId,
-    required: true,
+    ref: "Order",
   },
   reviewer: {
     type: mongoose.ObjectId,
     required: true,
     ref: "User",
   },
-  beReviewerId: {
+  merchant: {
     type: mongoose.ObjectId,
-    required: true,
+    ref: "Merchant",
+  },
+  partner: {
+    type: mongoose.ObjectId,
+    ref: "Partner",
   },
 });
 
