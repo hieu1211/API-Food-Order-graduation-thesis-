@@ -46,15 +46,6 @@ const registerMerchantValidation = (data) => {
     typeFood: Joi.number().valid(0, 1).required().messages({
       "any.only": "Loại đồ ăn không được để trống",
     }),
-    dayPart: Joi.array()
-      .max(3)
-      .items(Joi.number().min(0).max(2).required())
-      .required()
-      .messages({
-        "items.empty": "Thời điểm hoạt động trong ngày không được để trống",
-        "array.includesRequiredUnknowns":
-          "Thời điểm hoạt động trong ngày không được để trống",
-      }),
     phone: Joi.string().max(10).required().messages({
       "number.empty": "Số điện thoại quán không được để trống",
       "number.min": "Số điện thoại quán đại diện không hợp lệ",
@@ -99,16 +90,8 @@ const registerMerchantValidation = (data) => {
         time: Joi.string(),
       }),
     }),
-    avt: Joi.any(),
-    // foods:Joi.array().items(Joi.object({
-    //     name:Joi.string().min(2).max(50).required(),
-    //     price:Joi.number().min(10**3).max(10**8-1).required,
-    //     catId:Joi.objectId().required(),
-
-    // })),
-    // category:Joi.array().items(Joi.object({
-    //     name:Joi.string().max(50).required(),
-    // }))
+    avt: Joi.string(),
+    contract: Joi.string(),
     category: Joi.array().items(
       Joi.object({
         name: Joi.string().max(50).required(),
@@ -202,6 +185,9 @@ const registerPartnerValidation = (data) => {
       "number.min": "Số điện thoại người đại diện không hợp lệ",
       "number.max": "Số điện thoại người đại diện không hợp lệ",
     }),
+    setting: Joi.object({
+      radiusWorking: Joi.number().required(),
+    }).required(),
   });
   return schema.validate(data);
 };

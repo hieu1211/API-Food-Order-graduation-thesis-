@@ -5,6 +5,20 @@ const Order = require("../model/Order");
 const jwtValidation = require("../middleware/jwt.validate");
 const md5 = require("md5");
 
+function getSunday(d) {
+  d = new Date(d);
+  var day = d.getDay(),
+    diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
+  return new Date(d.setDate(diff + 6));
+}
+
+function getMonday(d) {
+  d = new Date(d);
+  var day = d.getDay(),
+    diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
+  return new Date(d.setDate(diff));
+}
+
 router.get("/getbystatus", jwtValidation, async (req, res) => {
   try {
     const payload = jwt.verify(
@@ -140,6 +154,20 @@ router.get("/getbyid", jwtValidation, async (req, res) => {
   } catch (err) {
     res.status(400).send(err);
   }
+});
+
+router.get("/ordersinweek", jwtValidation, async (req, res) => {
+  const dateTime = req.query.timestamp;
+  if (req.permission == "partner") {
+    const firstWeek = +getMonday(dateTime);
+    const endWeek = +getSunday(dateTime);
+    const orders = await Order.find({
+      deliverId: req._id,
+      timeOrder: { $gt: firstWeek, $lt: endWeek },
+    });
+    return res.status(200).send(orders);
+  }
+  return res.status(400).send("Unauth");
 });
 
 module.exports = router;

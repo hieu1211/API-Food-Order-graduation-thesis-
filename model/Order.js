@@ -143,5 +143,9 @@ const orderSchema = new mongoose.Schema({
   code: {
     type: String,
   },
+  cancelPartner: {
+    type: [mongoose.ObjectId],
+    ref: "Partner",
+  },
 });
 module.exports = mongoose.model("Order", orderSchema);

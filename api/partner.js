@@ -10,8 +10,10 @@ const { loginValidationEmail } = require("../middleware/auth.validate");
 const md5 = require("md5");
 
 router.post("/register", jwtValidation, async (req, res) => {
+  // console.log(req.body);
   if (req.permission !== "manager") return res.status(401).send("Unauthorized");
   const { error } = registerPartnerValidation(req.body);
+
   if (error) return res.status(400).send(error.details[0].message);
   const partner = new Partner({
     ...req.body,
@@ -109,6 +111,7 @@ router.get("/profile", jwtValidation, async (req, res) => {
     const profile = await Partner.findOne({ _id: payload._id }).select([
       "-password",
     ]);
+    console.log(profile);
     res.send(JSON.stringify(profile));
   } catch (error) {
     res.status(400).send("can't find Partner}");
