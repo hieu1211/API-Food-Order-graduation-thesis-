@@ -6,14 +6,14 @@ const jwtValidation = require("../middleware/jwt.validate");
 const md5 = require("md5");
 
 function getSunday(d) {
-  d = new Date(d);
+  d = new Date(parseInt(d));
   var day = d.getDay(),
     diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
   return new Date(d.setDate(diff + 6));
 }
 
 function getMonday(d) {
-  d = new Date(d);
+  d = new Date(parseInt(d));
   var day = d.getDay(),
     diff = d.getDate() - day + (day == 0 ? -6 : 1); // adjust when day is sunday
   return new Date(d.setDate(diff));
@@ -157,7 +157,7 @@ router.get("/getbyid", jwtValidation, async (req, res) => {
 });
 
 router.get("/ordersinweek", jwtValidation, async (req, res) => {
-  const dateTime = req.query.timestamp;
+  const dateTime = req.query.time;
   if (req.permission == "partner") {
     const firstWeek = +getMonday(dateTime);
     const endWeek = +getSunday(dateTime);
@@ -165,7 +165,18 @@ router.get("/ordersinweek", jwtValidation, async (req, res) => {
       deliverId: req._id,
       timeOrder: { $gt: firstWeek, $lt: endWeek },
     });
-    return res.status(200).send(orders);
+    const ordersCanceled = await Order.find({
+      timeOrder: { $gt: firstWeek, $lt: endWeek },
+      cancelPartner: {
+        $in: req._id,
+      },
+    });
+    return res.status(200).send({
+      monday: firstWeek,
+      sunday: endWeek,
+      orders,
+      ordersCanceled,
+    });
   }
   return res.status(400).send("Unauth");
 });
