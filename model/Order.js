@@ -147,5 +147,13 @@ const orderSchema = new mongoose.Schema({
     type: [mongoose.ObjectId],
     ref: "Partner",
   },
+  reviewPartner: {
+    type: mongoose.ObjectId,
+    ref: "Review",
+  },
+  reviewMerchant: {
+    type: mongoose.ObjectId,
+    ref: "Review",
+  },
 });
 module.exports = mongoose.model("Order", orderSchema);
