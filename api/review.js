@@ -14,12 +14,10 @@ router.post("/newreview", jwtValidation, async (req, res) => {
     return;
   }
 
-  const user = await User.findOne({ _id: dataReview.reviewer });
-  const reviewer = {
-    reviewerId: user._id,
-    name: user.info.name,
-    avt: user.info.avt,
-  };
+  const reviewer = await User.find({ _id: dataReview.reviewer }).populated(
+    "reviewer"
+  );
+
   const review = new Review({ ...dataReview, reviewer: reviewer });
   console.log(review);
 

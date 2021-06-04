@@ -121,15 +121,15 @@ router.get("/:id", jwtValidation, async (req, res) => {
       req.permission !== "manager" &&
       (req.permission !== "merchant" || req._id !== parseInt(req.params.id))
     ) {
-      const merchants = await Merchant.findOne({ _id: req.params.id }).select([
+      const partner = await Partner.findOne({ _id: req.params.id }).select([
         "-email",
         "-password",
         "-representative",
       ]);
-      res.send(merchants);
+      res.send(partner);
     } else {
-      const merchants = await Merchant.findOne({ _id: req.params.id });
-      res.send(merchants);
+      const partner = await Partner.findOne({ _id: req.params.id });
+      res.send(partner);
     }
   } catch (err) {
     res.status(400).send(err);

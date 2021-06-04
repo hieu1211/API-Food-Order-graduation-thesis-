@@ -116,7 +116,6 @@ router.get("/:id", jwtValidation, async (req, res) => {
       (req.permission !== "merchant" || req._id !== parseInt(req.params.id))
     ) {
       const merchants = await Merchant.findOne({ _id: req.params.id }).select([
-        "-email",
         "-password",
         "-representative",
       ]);

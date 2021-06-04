@@ -1,19 +1,19 @@
 const mongoose = require("mongoose");
 
-const reviewerSchema = new mongoose.Schema({
-  reviewerId: {
-    type: mongoose.ObjectId,
-    required: true,
-  },
-  name: {
-    type: String,
-    required: true,
-  },
-  avt: {
-    type: String,
-    required: true,
-  },
-});
+// const reviewerSchema = new mongoose.Schema({
+//   reviewerId: {
+//     type: mongoose.ObjectId,
+//     required: true,
+//   },
+//   name: {
+//     type: String,
+//     required: true,
+//   },
+//   avt: {
+//     type: String,
+//     required: true,
+//   },
+// });
 
 const reviewSchema = new mongoose.Schema({
   rate: {
@@ -38,8 +38,9 @@ const reviewSchema = new mongoose.Schema({
     required: true,
   },
   reviewer: {
-    type: reviewerSchema,
+    type: mongoose.ObjectId,
     required: true,
+    ref: "User",
   },
   beReviewerId: {
     type: mongoose.ObjectId,
