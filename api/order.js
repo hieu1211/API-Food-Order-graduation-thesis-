@@ -164,7 +164,7 @@ router.get("/ordersinweek", jwtValidation, async (req, res) => {
     const orders = await Order.find({
       deliverId: req._id,
       timeOrder: { $gt: firstWeek, $lt: endWeek },
-    });
+    }).populate("reviewPartner");
     const ordersCanceled = await Order.find({
       timeOrder: { $gt: firstWeek, $lt: endWeek },
       cancelPartner: {
