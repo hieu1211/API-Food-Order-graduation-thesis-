@@ -69,10 +69,10 @@ const userSchema = new mongoose.Schema({
     type: [mongoose.ObjectId],
     ref: "Merchant",
   },
-  quantityOrderedSuccess: {
-    type: Number,
+  blocked: {
+    type: Boolean,
+    default: false,
     required: true,
-    default: 0,
   },
 });
 

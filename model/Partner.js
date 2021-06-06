@@ -86,6 +86,9 @@ const partnerSchema = new mongoose.Schema({
     type: settingSchema,
     require: true,
   },
+  contract: {
+    type: String,
+  },
 });
 
 const infoSchema = new mongoose.Schema({});

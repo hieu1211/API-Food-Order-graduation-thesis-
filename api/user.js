@@ -7,6 +7,7 @@ const {
 } = require("../middleware/register.validate");
 const jwtValidation = require("../middleware/jwt.validate");
 const User = require("../model/User");
+const Order = require("../model/Order");
 const md5 = require("md5");
 const jwt = require("jsonwebtoken");
 
@@ -47,17 +48,23 @@ router.post("/login", async (req, res) => {
     return res.status(400).send(error.details[0].message);
   }
   const user = await User.findOne({ username: req.body.username });
-  if (!user) {
-    return res.status(400).send("Username doesn't exist!");
+  if (!user || user.password !== md5(req.body.password)) {
+    return res.status(400).send("Tài khoản hoặc mật khẩu sai!");
   }
-  if (user.password !== md5(req.body.password))
-    return res.status(400).send("Password is wrong!");
+  if (user.blocked)
+    return res
+      .status(400)
+      .send(
+        "Tài khoản đã bị khóa! Vui lòng liên hệ CSKH để biết thêm thông tin chi tiết"
+      );
+
   const token = jwt.sign(
     { _id: user._id, permission: "user" },
     process.env.SECRET_KEY
   );
   res.status(200).header({ auth_token: token }).send({ token, id: user._id });
 });
+
 router.post("/changeprofile", jwtValidation, async (req, res) => {
   const newData = req.body;
   const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
@@ -145,6 +152,24 @@ router.get("/profile", jwtValidation, async (req, res) => {
   } catch (error) {
     res.status(400).send("can't find User");
   }
+});
+
+router.get("/checkuniquephone", jwtValidation, async (req, res) => {
+  const user = await User.findOne({ "info.phone": req.query.phone });
+  if (!user) return res.status(200).send("unique");
+  return res.status(400).send("Not unique");
+});
+
+router.get("/checkprestige", jwtValidation, async (req, res) => {
+  console.log(req.query);
+  const orders = await Order.find({
+    userOrderId: req.query.userid,
+    $or: [
+      { $and: [{ reasonCancel: [] }, { status: "complete" }] },
+      { reasonCancel: ["Khách không nhận đồ"] },
+    ],
+  });
+  res.status(200).send(orders);
 });
 
 //Query user by id

@@ -1,6 +1,7 @@
 const Order = require("./model/Order");
 const Partner = require("./model/Partner");
 const User = require("./model/User");
+const { Merchant } = require("./model/Merchant");
 
 var orders = [];
 var rooms = [];
@@ -239,6 +240,17 @@ const socket = function (server) {
         io.in(String(order_id)).emit("userCancelOrder", order_id);
       });
 
+      socket.on("closeMerchant", async (merchantId) => {
+        await Merchant.findOneAndUpdate(
+          { _id: merchantId },
+          {
+            $set: {
+              status: "close",
+            },
+          }
+        );
+      });
+
       //partners
       socket.on("chooseOrder", async (order_id) => {
         console.log("asdasdasdasd");
@@ -377,6 +389,30 @@ const socket = function (server) {
           return false;
         });
         socket.emit("orderDelivering", orderDelivering);
+      });
+
+      socket.on("userNotReceiveFoods", async (order_id) => {
+        const idx = orders.findIndex((order) => {
+          return String(order._id) === order_id;
+        });
+        if (idx > -1) {
+          orders.splice(idx, 1);
+        }
+        await Order.findOneAndUpdate(
+          { _id: order_id },
+          {
+            $set: {
+              status: "cancel",
+              timeDeliverDone: 0,
+              reasonCancel: ["Khách không nhận đồ"],
+            },
+          },
+          {
+            new: true,
+          }
+        );
+        io.in(String(order_id)).emit("userNotReceiveFoods", order_id);
+        socket.leave(order_id);
       });
 
       socket.on("sendGeo", (geo) => {

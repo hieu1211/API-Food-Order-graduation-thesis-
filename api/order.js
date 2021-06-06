@@ -111,6 +111,14 @@ router.get("/getallmyorder", jwtValidation, async (req, res) => {
         .populate("merchantId")
         .populate("deliverId");
       res.send(orders);
+    } else if (payload.permission === "merchant") {
+      const orders = await Order.find({
+        merchantId: payload._id,
+      })
+        .populate("userOrderId")
+        .populate("merchantId")
+        .populate("deliverId");
+      res.send(orders);
     }
   } catch (err) {
     res.status(400).send(err);
