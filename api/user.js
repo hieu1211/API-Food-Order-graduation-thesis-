@@ -180,7 +180,7 @@ router.get("/:id", jwtValidation, async (req, res) => {
   )
     return res.status(401).send("Unauthorized");
   try {
-    const user = await User.find({ _id: req.params.id });
+    const user = await User.findOne({ _id: req.params.id });
     res.send(user);
   } catch (err) {
     res.status(400).send(err);
@@ -211,5 +211,17 @@ router.post("/changeavt", jwtValidation, async (req, res) => {
   }
   res.status(400).send("Can't update avatar");
 });
+
+// router.get("/getallusers", jwtValidation, async (req, res) => {
+//   console.log("ccc");
+//   try {
+//     if (req.permission === "manager") {
+//       const users = await User.find({});
+//       res.send(users);
+//     }
+//   } catch (err) {
+//     res.status(400).send(err);
+//   }
+// });
 
 module.exports = router;

@@ -142,7 +142,6 @@ const socket = function (server) {
         if (idx > -1) {
           orders.splice(idx, 1);
         }
-        console.log(data.reasons);
         await Order.findOneAndUpdate(
           { _id: data.order_id },
           {
@@ -186,7 +185,6 @@ const socket = function (server) {
         io.in(order_id).emit("newOrder", orderSaved);
 
         setTimeout(async () => {
-          console.log("startRemove", order_id);
           const order = orders.find((order) => {
             return String(order._id) === order_id;
           });
@@ -217,7 +215,6 @@ const socket = function (server) {
       });
 
       socket.on("userCancelOrder", async (order_id) => {
-        console.log("call");
         const client = clients.find((client) => client.clientId == socket.id);
         const idx = orders.findIndex((order) => {
           return String(order._id) === order_id;
@@ -253,7 +250,6 @@ const socket = function (server) {
 
       //partners
       socket.on("chooseOrder", async (order_id) => {
-        console.log("asdasdasdasd");
         const client = clients.find((client) => client.clientId == socket.id);
         const order = orders.find((order) => {
           return String(order._id) === order_id;
@@ -442,7 +438,6 @@ const socket = function (server) {
 
         for (od of ods) {
           socket.join(String(od._id));
-          console.log(od);
         }
       });
 
@@ -451,7 +446,6 @@ const socket = function (server) {
         const order = orders.find((order) => {
           return String(order._id) === data.order_id;
         });
-        console.log(data);
         const newMessage = { type: data.type, content: data.message };
         order.chat.push(newMessage);
         await Order.findOneAndUpdate(

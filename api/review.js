@@ -62,16 +62,31 @@ router.post("/getreview", jwtValidation, async (req, res) => {
   }
 });
 
-router.post("/getreviewbymerchantid", jwtValidation, async (req, res) => {
+router.post("/getreviewbyid", jwtValidation, async (req, res) => {
   try {
-    const merchantId = req.query.id;
-    const review = await Review.find({
-      merchant: merchantId,
-    }).populate("reviewer");
-    if (review) {
-      res.send(review);
+    const id = req.body.id;
+    const type = req.body.type;
+    console.log(id,type)
+    if (type == 1) {
+      const review = await Review.find({
+        merchant: id,
+      }).populate("reviewer");
+
+      if (review) {
+        res.send(review);
+      } else {
+        res.send("NotFound");
+      }
     } else {
-      res.send("NotFound");
+      const review = await Review.find({
+        partner: id,
+      }).populate("reviewer");
+
+      if (review) {
+        res.send(review);
+      } else {
+        res.send("NotFound");
+      }
     }
   } catch (error) {
     res.status(400).send(error);
