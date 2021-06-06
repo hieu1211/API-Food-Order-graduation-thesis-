@@ -34,8 +34,18 @@ router.post("/login", async (req, res) => {
     const merchant = await Merchant.findOne({
       email: req.body.email,
     });
+    console.log(merchant);
+    if (merchant === null) {
+      res.send("Account not exist!");
+      return;
+    }
     if (merchant.password !== md5(req.body.password)) {
-      return res.status(400).send("Password is wrong!");
+      res.send("Password is wrong!");
+      return;
+    }
+    if (merchant.status === "suspend") {
+      res.send("Account is block!");
+      return;
     }
     const token = jwt.sign(
       { _id: merchant._id, permission: "merchant" },
@@ -347,6 +357,32 @@ router.post("/updatestatus", jwtValidation, async (req, res) => {
       }
     );
     res.send(JSON.stringify(preMerchant.status));
+    return;
+  }
+  res.status(400).send("Can't update status");
+});
+
+router.post("/blockmerchant", jwtValidation, async (req, res) => {
+  if (req.permission === "manager") {
+    let newStatus = "";
+    if (req.body.status === "suspend") {
+      newStatus = "close";
+    } else {
+      newStatus = "suspend";
+    }
+
+    let preMerchant = await Merchant.findOneAndUpdate(
+      { _id: req.body.id },
+      {
+        $set: {
+          status: newStatus,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    res.send(preMerchant.status);
     return;
   }
   res.status(400).send("Can't update status");
