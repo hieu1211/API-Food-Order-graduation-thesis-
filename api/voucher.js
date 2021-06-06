@@ -31,7 +31,6 @@ router.post("/remove", jwtValidation, async (req, res) => {
   try {
     if (req.permission == "manager") {
       const removed = await Voucher.findByIdAndRemove(req.body.id);
-      console.log(removed);
       res.send(removed);
     } else res.status(400).send("Unauthorized!");
   } catch (error) {

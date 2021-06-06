@@ -79,7 +79,6 @@ router.get("/getbypartner", jwtValidation, async (req, res) => {
       process.env.SECRET_KEY
     );
     const partnerId = req.query.id;
-    console.log(typeof partnerId,payload.permission)
     if (
       payload.permission === "manager" ||
       (payload.permission === "partner" && payload._id == partnerId)
@@ -91,7 +90,6 @@ router.get("/getbypartner", jwtValidation, async (req, res) => {
         .populate("merchantId")
         .populate("deliverId");
       res.send(orders);
-      console.log(orders)
     }
   } catch (err) {
     res.status(400).send(err);

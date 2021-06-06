@@ -49,8 +49,6 @@ const socket = function (server) {
         }
       }
 
-      console.log("user connected", socket.id);
-
       socket.emit("currentOrder", orders);
 
       //merchant
@@ -165,8 +163,16 @@ const socket = function (server) {
         socket.emit("canOrder", orderProcessing);
       });
 
-      socket.on("startOrder", async (data) => {
+      socket.on("startOrder", async (data, fn) => {
         let orderData = { ...data };
+        const client = clients.find((client) => client.clientId == socket.id);
+        const user = await User.findOne({
+          _id: client.customId,
+        });
+        if (user.blocked) {
+          return fn(false);
+        }
+        fn(true);
         delete orderData.userInfo;
         let newOrder = new Order(orderData);
         newOrder = await newOrder.save();
@@ -208,9 +214,6 @@ const socket = function (server) {
             }
             orders.splice(idx, 1);
           }
-          // io.sockets.adapter.rooms[order_id].forEach(function (s) {
-          //   s.leave(order_id);
-          // });
         }, 8000000);
       });
 
@@ -394,7 +397,7 @@ const socket = function (server) {
         if (idx > -1) {
           orders.splice(idx, 1);
         }
-        await Order.findOneAndUpdate(
+        const orderUpdated = await Order.findOneAndUpdate(
           { _id: order_id },
           {
             $set: {
@@ -407,6 +410,27 @@ const socket = function (server) {
             new: true,
           }
         );
+
+        //auto block
+        const ordersOfUser = await await Order.find({
+          userOrderId: orderUpdated.userOrderId,
+          $or: [
+            { $and: [{ reasonCancel: [] }, { status: "complete" }] },
+            { reasonCancel: ["Khách không nhận đồ"] },
+          ],
+        });
+        const percent =
+          ordersOfUser.filter((od) => od.status === "complete").length /
+          ordersOfUser.length;
+        if (ordersOfUser.length >= 4 && percent < 0.5) {
+          await User.findOneAndUpdate(
+            {
+              _id: orderUpdated.userOrderId,
+            },
+            { $set: { blocked: true } }
+          );
+        }
+
         io.in(String(order_id)).emit("userNotReceiveFoods", order_id);
         socket.leave(order_id);
       });

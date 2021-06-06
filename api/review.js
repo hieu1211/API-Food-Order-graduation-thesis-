@@ -66,7 +66,6 @@ router.post("/getreviewbyid", jwtValidation, async (req, res) => {
   try {
     const id = req.body.id;
     const type = req.body.type;
-    console.log(id,type)
     if (type == 1) {
       const review = await Review.find({
         merchant: id,

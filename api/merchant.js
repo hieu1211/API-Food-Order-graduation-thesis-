@@ -34,7 +34,6 @@ router.post("/login", async (req, res) => {
     const merchant = await Merchant.findOne({
       email: req.body.email,
     });
-    console.log(merchant);
     if (merchant === null) {
       res.send("Account not exist!");
       return;
@@ -60,7 +59,6 @@ router.post("/login", async (req, res) => {
 
 //check Authen after login
 router.post("/auth", jwtValidation, (req, res) => {
-  console.log(req.header("auth_token"));
   try {
     const payload = jwt.verify(
       req.header("auth_token"),
@@ -142,7 +140,6 @@ router.get("/:id", jwtValidation, async (req, res) => {
 
 router.post("/changecategory", jwtValidation, async (req, res) => {
   const newData = req.body;
-  console.log(newData);
   const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
   if (payload.permission === "merchant") {
     let merchant = await Merchant.findOneAndUpdate(
@@ -209,7 +206,6 @@ router.post("/foodadd", jwtValidation, async (req, res) => {
       if (String(cat._id) === catId) {
         cat.foods.push(newFood);
       }
-      console.log(typeof cat._id, typeof catId);
       return cat;
     });
 
@@ -223,8 +219,6 @@ router.post("/foodadd", jwtValidation, async (req, res) => {
 
 router.post("/foodremove", jwtValidation, async (req, res) => {
   const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
-
-  console.log(req.body);
 
   if (payload.permission === "merchant") {
     const preMerchant = await Merchant.findOne({ _id: payload._id });
@@ -242,7 +236,6 @@ router.post("/foodremove", jwtValidation, async (req, res) => {
 
 router.post("/foodedit", jwtValidation, async (req, res) => {
   const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
-  console.log(req.body);
   const newFood = {
     _id: req.body._id,
     name: req.body.name,
@@ -278,7 +271,6 @@ router.post("/foodedit", jwtValidation, async (req, res) => {
 
 router.post("/addressedit", jwtValidation, async (req, res) => {
   const newData = req.body;
-  console.log(newData);
   const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
   if (payload.permission === "merchant") {
     let merchant = await Merchant.findOneAndUpdate(
@@ -300,7 +292,6 @@ router.post("/addressedit", jwtValidation, async (req, res) => {
 
 router.post("/getopentime", jwtValidation, async (req, res) => {
   const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
-  console.log(payload._id);
   if (payload.permission === "merchant") {
     let preMerchant = await Merchant.findOne({ _id: payload._id });
     res.send(JSON.stringify(preMerchant.openTime));
@@ -332,7 +323,6 @@ router.post("/updateopentime", jwtValidation, async (req, res) => {
 
 router.post("/getstatus", jwtValidation, async (req, res) => {
   const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
-  console.log(payload._id);
   if (payload.permission === "merchant") {
     let preMerchant = await Merchant.findOne({ _id: payload._id });
     res.send(JSON.stringify(preMerchant.status));
