@@ -223,4 +223,24 @@ router.post("/changeavt", jwtValidation, async (req, res) => {
 //   }
 // });
 
+router.post("/blockuser", jwtValidation, async (req, res) => {
+  console.log(req.body);
+  if (req.permission === "manager") {
+    let preUser = await User.findOneAndUpdate(
+      { _id: req.body.id },
+      {
+        $set: {
+          blocked: !req.body.blocked,
+        },
+      },
+      {
+        new: true,
+      }
+    );
+    res.send(preUser.status);
+    return;
+  }
+  res.status(400).send("Can't update blocked");
+});
+
 module.exports = router;

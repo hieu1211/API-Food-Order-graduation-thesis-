@@ -22,7 +22,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 //Connect to DB
-mongoose.connect(process.env.DATABASE_CONNECT, { useNewUrlParser: true }, () =>
+mongoose.connect(process.env.DATABASE_CONNECT, { useCreateIndex: true }, () =>
   console.log("Connected to DB")
 );
 
