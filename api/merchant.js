@@ -216,27 +216,30 @@ router.post("/foodadd", jwtValidation, async (req, res) => {
 });
 
 router.post("/foodremove", jwtValidation, async (req, res) => {
-
   if (req.permission === "merchant") {
     const preMerchant = await Merchant.findOne({ _id: req._id });
 
-  const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
-
-  if (payload.permission === "merchant") {
-    const preMerchant = await Merchant.findOne({ _id: payload._id });
-
-    const indexOfCat = preMerchant.category.findIndex(
-      (cat) => cat._id + "" === req.body.catId
+    const payload = jwt.verify(
+      req.header("auth_token"),
+      process.env.SECRET_KEY
     );
 
-    preMerchant.category[indexOfCat].foods.pull(req.body.foodId);
+    if (payload.permission === "merchant") {
+      const preMerchant = await Merchant.findOne({ _id: payload._id });
 
-    preMerchant.save();
-    res.send(JSON.stringify(preMerchant));
-    return;
+      const indexOfCat = preMerchant.category.findIndex(
+        (cat) => cat._id + "" === req.body.catId
+      );
+
+      preMerchant.category[indexOfCat].foods.pull(req.body.foodId);
+
+      preMerchant.save();
+      res.send(JSON.stringify(preMerchant));
+      return;
+    }
+    res.status(400).send("Can't remove food");
   }
-  res.status(400).send("Can't remove food");
-};
+});
 
 router.post("/foodedit", jwtValidation, async (req, res) => {
   const payload = jwt.verify(req.header("auth_token"), process.env.SECRET_KEY);
