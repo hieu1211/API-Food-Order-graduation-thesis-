@@ -204,7 +204,6 @@ const merchantSchema = new mongoose.Schema({
   },
   contract: {
     type: String,
-    required: true,
   },
   openTime: {
     type: openTimeSchema,
