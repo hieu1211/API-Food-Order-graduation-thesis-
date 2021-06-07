@@ -161,7 +161,6 @@ router.get("/checkuniquephone", jwtValidation, async (req, res) => {
 });
 
 router.get("/checkprestige", jwtValidation, async (req, res) => {
-  console.log(req.query);
   const orders = await Order.find({
     userOrderId: req.query.userid,
     $or: [
