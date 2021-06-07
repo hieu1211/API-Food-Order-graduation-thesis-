@@ -252,13 +252,13 @@ const socket = function (server) {
       });
 
       //partners
-      socket.on("chooseOrder", async (order_id) => {
+      socket.on("chooseOrder", async (order_id, fn) => {
         const client = clients.find((client) => client.clientId == socket.id);
         const order = orders.find((order) => {
           return String(order._id) === order_id;
         });
-        if (client.type == "partner") {
-          if (order.status == "finding") order.status = "waitConfirm";
+        if (client.type == "partner" && order.status == "finding") {
+          order.status = "waitConfirm";
           const orderUpdated = await Order.findOneAndUpdate(
             { _id: order_id },
             {
@@ -289,7 +289,8 @@ const socket = function (server) {
             orderId: order_id,
             partner: orderUpdated.deliverId,
           });
-        }
+          fn(true);
+        } else fn(false);
       });
 
       socket.on("DeliveringOrder", async (order_id) => {
@@ -304,6 +305,7 @@ const socket = function (server) {
             {
               $set: {
                 status: order.status,
+                timePartnerGetFood: Date.now(),
               },
             },
             {
