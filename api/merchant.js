@@ -20,7 +20,7 @@ router.post("/register", jwtValidation, async (req, res) => {
     const savedMerchant = await merchant.save();
     return res.send(savedMerchant);
   } catch (err) {
-    return res.status(200).send(err);
+    return res.status(400).send(err);
   }
 });
 
@@ -53,7 +53,7 @@ router.post("/login", async (req, res) => {
     const id = merchant._id;
     res.status(200).header({ auth_token: token }).send({ token, id });
   } catch (err) {
-    return res.send(err);
+    return res.status(400).send(err);
   }
 });
 
