@@ -188,6 +188,7 @@ const registerPartnerValidation = (data) => {
     setting: Joi.object({
       radiusWorking: Joi.number().required(),
     }).required(),
+    contract: Joi.string(),
   });
   return schema.validate(data);
 };
