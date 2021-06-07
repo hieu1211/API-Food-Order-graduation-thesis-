@@ -162,6 +162,19 @@ const merchantSchema = new mongoose.Schema({
   email: {
     type: String,
     unique: true,
+    validate: {
+      validator: async function (email) {
+        const user = await this.constructor.findOne({ email });
+        if (user) {
+          if (this.id === user.id) {
+            return true;
+          }
+          return false;
+        }
+        return true;
+      },
+      message: (props) => "The specified email address is already in use.",
+    },
     minlength: 6,
     maxlength: 30,
     required: true,
