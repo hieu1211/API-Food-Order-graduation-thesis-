@@ -34,7 +34,7 @@ app.use("/api/orders", apiOrder);
 app.use("/api/vouchers", apiVoucher);
 app.use("/api/reviews", apiReview);
 
-let server = app.listen(process.env.PORT || 4000, () =>
+let server = app.listen(process.env.PORT, () =>
   console.log("server listen on port 4000")
 );
 socket(server);
