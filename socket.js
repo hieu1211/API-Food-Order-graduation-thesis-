@@ -257,8 +257,8 @@ const socket = function (server) {
         const order = orders.find((order) => {
           return String(order._id) === order_id;
         });
-        if (client.type == "partner" && order.status == "finding") {
-          order.status = "waitConfirm";
+        if (client.type == "partner" && !order.deliverId) {
+          if (order.status == "finding") order.status = "waitConfirm";
           const orderUpdated = await Order.findOneAndUpdate(
             { _id: order_id },
             {

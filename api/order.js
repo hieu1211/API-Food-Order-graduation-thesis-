@@ -110,34 +110,12 @@ router.get("/getbypartner", jwtValidation, async (req, res) => {
       process.env.SECRET_KEY
     );
     const partnerId = req.query.id;
-
-    console.log(typeof partnerId, payload.permission);
-
     if (
       payload.permission === "manager" ||
       (payload.permission === "partner" && payload._id == partnerId)
     ) {
       const orders = await Order.find({
         deliverId: partnerId,
-      })
-        .populate("userOrderId")
-        .populate("merchantId")
-        .populate("deliverId");
-      res.send(orders);
-
-      console.log(orders);
-    }
-  } catch (err) {
-    res.status(400).send(err);
-  }
-});
-
-router.get("/getbyuser", jwtValidation, async (req, res) => {
-  try {
-    const userId = req.query.id;
-    if (req.permission === "manager" || req.permission === "user") {
-      const orders = await Order.find({
-        userOrderId: userId,
       })
         .populate("userOrderId")
         .populate("merchantId")
@@ -229,6 +207,7 @@ router.get("/ordersinweek", jwtValidation, async (req, res) => {
   const dateTime = req.query.time;
   const firstWeek = +getMonday(dateTime);
   const endWeek = +getSunday(dateTime);
+  console.log(firstWeek, endWeek);
   if (req.permission == "partner") {
     const orders = await Order.find({
       deliverId: req._id,
