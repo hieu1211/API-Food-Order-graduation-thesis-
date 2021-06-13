@@ -24,6 +24,10 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  tagReview: {
+    type: Number,
+    required: true,
+  },
   typeReview: {
     type: Number, //parter or merchant
     enum: [1, 2],

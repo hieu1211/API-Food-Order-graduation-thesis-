@@ -8,6 +8,7 @@ const User = require("../model/User");
 const Order = require("../model/Order");
 
 router.post("/newreview", jwtValidation, async (req, res) => {
+  console.log("hello", req.body);
   if (req.permission === "user") {
     const dataReview = req.body;
     if (dataReview.rate === null) {
